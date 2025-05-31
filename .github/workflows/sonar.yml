@@ -1,0 +1,37 @@
+name: SonarCloud Analysis for PHP
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+jobs:
+  sonarcloud:
+    name: SonarCloud Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, xml, ctype, iconv, intl, zip
+          tools: composer
+
+      - name: Install SonarScanner
+        run: |
+          curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
+          unzip sonar-scanner.zip
+          ./sonar-scanner-*/bin/sonar-scanner \
+            -Dsonar.projectKey=apibankk_proyecto \
+            -Dsonar.organization=apibankk \
+            -Dsonar.sources=DATAFILLER \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.php.coverage.reportPaths=coverage.xml \
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
