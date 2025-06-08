@@ -1,4 +1,4 @@
-name: SonarCloud Analysis for PHP
+name: Build
 
 on:
   push:
@@ -6,16 +6,15 @@ on:
       - main
   pull_request:
     types: [opened, synchronize, reopened]
-  workflow_dispatch:
 
 jobs:
-  sonarcloud:
-    name: SonarCloud Scan
+  sonarqube:
+    name: SonarQube
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Para análisis más preciso
 
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
@@ -27,13 +26,7 @@ jobs:
       - name: Install dependencies
         run: composer install --no-progress --no-suggest --prefer-dist
 
-      - name: Run SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v1.11.0
-        with:
-          projectKey: apibankk_proyecto
-          organization: apibankk
-          token: ${{ secrets.SONAR_TOKEN }}
-          # Opcional: si quieres especificar ruta y otros parámetros
-          extraProperties: |
-            sonar.sources=DATAFILLER
-            sonar.php.coverage.reportPaths=coverage.xml
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
