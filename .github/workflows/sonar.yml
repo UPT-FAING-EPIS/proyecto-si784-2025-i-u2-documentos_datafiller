@@ -3,7 +3,7 @@ name: Build
 on:
   push:
     branches:
-      - main
+      - master
   pull_request:
     types: [opened, synchronize, reopened]
 
@@ -14,19 +14,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Para análisis más preciso
+          fetch-depth: 0  # Mejor análisis con todo el historial
 
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
           extensions: mbstring, xml, ctype, iconv, intl, zip
-          tools: composer
-
-      - name: Install dependencies
-        run: composer install --no-progress --no-suggest --prefer-dist
 
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.projectKey=apibankk_proyecto
+            -Dsonar.organization=apibankk
+            -Dsonar.sources=DATAFILLER
+            -Dsonar.php.coverage.reportPaths=coverage.xml
