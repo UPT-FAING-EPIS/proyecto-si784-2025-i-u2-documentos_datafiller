@@ -28,7 +28,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
-            -Dsonar.projectKey=apibankk_proyecto
+            -Dsonar.projectKey=apibankk_proyectu2
             -Dsonar.organization=apibankk
             -Dsonar.sources=DATAFILLER
             -Dsonar.php.coverage.reportPaths=coverage.xml
