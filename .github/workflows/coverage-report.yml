@@ -30,6 +30,22 @@ jobs:
         extensions: mbstring, xml, ctype, iconv, intl, pdo, pdo_mysql, dom, filter, gd, iconv, json, mbstring, xdebug
         coverage: xdebug
     
+    - name: Fix submodule issues
+      run: |
+        # Remove any problematic .gitmodules entries
+        if [ -f ".gitmodules" ]; then
+          echo "Found .gitmodules file, checking contents:"
+          cat .gitmodules
+          # Remove the file if it contains vendor references
+          if grep -q "vendor/" .gitmodules; then
+            echo "Removing .gitmodules with vendor references"
+            rm .gitmodules
+          fi
+        fi
+        # Clean up any submodule references
+        git config --file .gitmodules --remove-section submodule.DATAFILLER/vendor/myclabs/deep-copy 2>/dev/null || true
+        git add . 2>/dev/null || true
+    
     - name: Verify DATAFILLER directory structure
       run: |
         echo "Checking directory structure:"
