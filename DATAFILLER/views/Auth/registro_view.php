@@ -16,13 +16,13 @@
             <div class="registro-form">
                 <h2>Registro de Usuario</h2>
                 
-                <?php if(isset($mensaje_exito)): ?>
+                <?php if(isset($mensaje_exito) && !empty($mensaje_exito)): ?>
                     <div class="success-message">
                         <?php echo $mensaje_exito; ?>
                     </div>
                 <?php endif; ?>
                 
-                <?php if(isset($mensaje_error)): ?>
+                <?php if(isset($mensaje_error) && !empty($mensaje_error)): ?>
                     <div class="error-message">
                         <?php echo $mensaje_error; ?>
                     </div>
@@ -65,7 +65,7 @@
                 </form>
                 
                 <div class="form-links">
-                    <p>¿Ya tienes una cuenta? <a href="login.php">Inicia sesión aquí</a></p>
+                    <p>¿Ya tienes una cuenta? <a href="login_view.php">Inicia sesión aquí</a></p>
                     <p><a href="../../index.php">Volver al inicio</a></p>
                 </div>
             </div>

@@ -9,8 +9,11 @@ if(!isset($_GET['token']) || empty($_GET['token'])) {
 
 $token = $_GET['token'];
 
-require_once '../../config/database.php';
-require_once '../../models/Usuario.php';
+// Usa autoload de Composer (¡muy importante!)
+require_once __DIR__ . '/../../vendor/autoload.php';
+
+use App\Config\Database;
+use App\Models\Usuario;
 
 $database = new Database();
 $db = $database->getConnection();
@@ -73,7 +76,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php if(!empty($mensaje_exito)): ?>
                     <div class="success-message"><?php echo $mensaje_exito; ?></div>
                     <div class="form-links">
-                        <p><a href="login.php" class="btn">Ir a Iniciar Sesión</a></p>
+                        <p><a href="login_view.php" class="btn">Ir a Iniciar Sesión</a></p>
                     </div>
                 <?php else: ?>
                     <p>Ingresa tu nueva contraseña para la cuenta: <strong><?php echo htmlspecialchars($tokenData['email']); ?></strong></p>
@@ -94,7 +97,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php endif; ?>
                 
                 <div class="form-links">
-                    <p><a href="login.php">Volver al inicio de sesión</a></p>
+                    <p><a href="login_view.php">Volver al inicio de sesión</a></p>
                 </div>
             </div>
         </div>

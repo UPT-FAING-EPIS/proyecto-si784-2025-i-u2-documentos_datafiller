@@ -1,58 +1,106 @@
 <?php
 session_start();
 
-// Redirigir si ya hay una sesión iniciada
-if(isset($_SESSION['usuario'])) {
-    header('Location: ../User/generardata.php');
+if(!isset($_GET['token']) || empty($_GET['token'])) {
+    header('Location: login.php?error=token_invalido');
     exit();
 }
 
-require_once '../../config/database.php';
+$token = $_GET['token'];
+
+require_once __DIR__ . '/../../vendor/autoload.php';
+
+use App\Config\Database;
+use App\Models\Usuario;
+
+$database = new Database();
+$db = $database->getConnection();
+$usuarioModel = new Usuario($db);
+
+$tokenData = $usuarioModel->verificarTokenRecuperacion($token);
+
+if(!$tokenData) {
+    $error_message = "El enlace de recuperación ha expirado o no es válido.";
+    include 'token_error_view.php';
+    exit();
+}
 
 $mensaje_error = '';
 $mensaje_exito = '';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = trim($_POST['email']);
-    
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $mensaje_error = 'Por favor ingrese un email válido.';
+// Procesar cambio de contraseña
+if($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if(empty($_POST['password']) || empty($_POST['confirm_password'])) {
+        $mensaje_error = 'Todos los campos son obligatorios.';
+    } elseif($_POST['password'] !== $_POST['confirm_password']) {
+        $mensaje_error = 'Las contraseñas no coinciden.';
+    } elseif(strlen($_POST['password']) < 6) {
+        $mensaje_error = 'La contraseña debe tener al menos 6 caracteres.';
     } else {
-        $db = new Database();
-        $conn = $db->getConnection();
-        
-        // Verificar si el email existe
-        $query = "SELECT id, nombre FROM tbusuario WHERE email = :email LIMIT 1";
-        $stmt = $conn->prepare($query);
-        $stmt->bindParam(':email', $email);
-        $stmt->execute();
-        
-        if ($stmt->rowCount() === 1) {
-            $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
-            
-            // Generar token único
-            $token = bin2hex(random_bytes(32));
-            $fecha_expiracion = date('Y-m-d H:i:s', strtotime('+1 hour'));
-            
-            // Guardar token en la base de datos
-            $query = "INSERT INTO tbrecuperacion_password (usuario_id, token, email, fecha_expiracion) 
-                      VALUES (:usuario_id, :token, :email, :fecha_expiracion)";
-            $stmt = $conn->prepare($query);
-            $stmt->bindParam(':usuario_id', $usuario['id']);
-            $stmt->bindParam(':token', $token);
-            $stmt->bindParam(':email', $email);
-            $stmt->bindParam(':fecha_expiracion', $fecha_expiracion);
-            
-            if ($stmt->execute()) {
-                $mensaje_exito = 'Se ha enviado un enlace de recuperación a tu email. (Funcionalidad de email pendiente de implementar)';
-                // Aquí implementarías el envío de email en el futuro
-            } else {
-                $mensaje_error = 'Error al procesar la solicitud. Intenta nuevamente.';
-            }
+        // Cambiar contraseña
+        if($usuarioModel->cambiarPassword($tokenData['usuario_id'], $_POST['password'])) {
+            $usuarioModel->marcarTokenUsado($token);
+            $mensaje_exito = 'Contraseña cambiada exitosamente. Puedes iniciar sesión con tu nueva contraseña.';
         } else {
-            $mensaje_error = 'No se encontró una cuenta asociada a este email.';
+            $mensaje_error = 'Error cambiando la contraseña. Intente nuevamente.';
         }
     }
 }
-
-include_once 'recuperar_password_view.php';
+?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Nueva Contraseña - Data Filler</title>
+    <link rel="stylesheet" href="../../public/css/styles.css">
+    <link rel="stylesheet" href="../../public/css/auth.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <?php if(!empty($mensaje_exito)): ?>
+        <meta http-equiv="refresh" content="5;url=login_view.php">
+    <?php endif; ?>
+</head>
+<body>
+    <div class="registro-container">
+        <div class="logo-section">
+            <img src="../../images/welcome_datafiller.jpg" alt="Data Filler Logo">
+        </div>
+        <div class="form-section">
+            <div class="registro-form">
+                <h2>Crear Nueva Contraseña</h2>
+                
+                <?php if(!empty($mensaje_error)): ?>
+                    <div class="error-message"><?php echo $mensaje_error; ?></div>
+                <?php endif; ?>
+                
+                <?php if(!empty($mensaje_exito)): ?>
+                    <div class="success-message"><?php echo $mensaje_exito; ?></div>
+                    <div class="form-links">
+                        <p><a href="login_view.php" class="btn">Ir a Iniciar Sesión</a></p>
+                        <p>Redirigiendo en 5 segundos...</p>
+                    </div>
+                <?php else: ?>
+                    <p>Ingresa tu nueva contraseña para la cuenta: <strong><?php echo htmlspecialchars($tokenData['email']); ?></strong></p>
+                    
+                    <form method="post">
+                        <div class="form-group">
+                            <label for="password">Nueva Contraseña</label>
+                            <input type="password" id="password" name="password" required minlength="6" placeholder="Mínimo 6 caracteres">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="confirm_password">Confirmar Nueva Contraseña</label>
+                            <input type="password" id="confirm_password" name="confirm_password" required placeholder="Repite la contraseña">
+                        </div>
+                        
+                        <button type="submit" class="submit-btn">Cambiar Contraseña</button>
+                    </form>
+                <?php endif; ?>
+                
+                <div class="form-links">
+                    <p><a href="login_view.php">Volver al inicio de sesión</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

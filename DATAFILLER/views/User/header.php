@@ -1,8 +1,9 @@
 <?php
 session_start();
 
-// Obtener información del usuario usando SOLO el controlador
-require_once '../../controllers/UsuarioController.php';
+require_once __DIR__ . '/../../vendor/autoload.php'; // Autoload de Composer
+
+use App\Controllers\UsuarioController;
 
 // Variables por defecto
 $plan_usuario = 'gratuito';
@@ -16,10 +17,6 @@ if(isset($_SESSION['usuario']) && isset($_SESSION['usuario']['id'])) {
     $plan_usuario = $datosUsuario['plan_usuario'];
     $consultas_restantes = $datosUsuario['consultas_restantes'];
 }
-
-// Debug temporal - remover después
-error_log("Plan usuario: " . $plan_usuario);
-error_log("Consultas restantes: " . $consultas_restantes);
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -64,4 +61,4 @@ error_log("Consultas restantes: " . $consultas_restantes);
             <?php endif; ?>
         </div>
     </header>
-    <main class="container"></main>
+    <main class="container">

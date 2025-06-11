@@ -1,3 +1,10 @@
+<?php
+session_start();
+if (!isset($_SESSION['usuario'])) {
+    header('Location: login_view.php');
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -13,7 +20,7 @@
         <header class="promo-header">
             <div class="header-content">
                 <img src="../../images/logo_datafiller.png" alt="Data Filler Logo" class="logo">
-                <h1>¡Bienvenido a Data Filler, <?php echo $_SESSION['usuario']['nombre']; ?>!</h1>
+                <h1>¡Bienvenido a Data Filler, <?php echo htmlspecialchars($_SESSION['usuario']['nombre']); ?>!</h1>
                 <p>Elige el plan perfecto para tus necesidades</p>
             </div>
         </header>

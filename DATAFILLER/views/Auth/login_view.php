@@ -24,7 +24,7 @@
                     <div class="success-message"><?php echo $mensaje_exito; ?></div>
                 <?php endif; ?>
 
-                <!-- AQUÍ ESTÁ EL CAMBIO: action="login.php" -->
+                <!-- El formulario envía a login.php que es el handler del POST -->
                 <form action="login.php" method="post">
                     <div class="form-group">
                         <label for="nombre">Nombre de Usuario</label>
@@ -40,8 +40,8 @@
                 </form>
 
                 <div class="form-links">
-                    <p>¿No tienes una cuenta? <a href="registro.php">Regístrate aquí</a></p>
-                    <p><a href="recuperar_password.php">¿Olvidaste tu contraseña?</a></p>
+                    <p>¿No tienes una cuenta? <a href="registro_view.php">Regístrate aquí</a></p>
+                    <p><a href="recuperar_password_view.php">¿Olvidaste tu contraseña?</a></p>
                     <p><a href="../../index.php">Volver al inicio</a></p>
                 </div>
             </div>

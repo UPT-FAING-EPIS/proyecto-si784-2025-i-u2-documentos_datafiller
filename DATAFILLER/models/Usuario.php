@@ -23,7 +23,6 @@ class Usuario {
         $this->conn = $db;
     }
 
-    
     // Crear nuevo usuario
     public function crear() {
         // Verificar si el usuario ya existe

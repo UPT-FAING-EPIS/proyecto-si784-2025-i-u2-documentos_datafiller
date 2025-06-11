@@ -31,8 +31,10 @@
                     </button>
                 </form>
 
+                <div id="mensaje-recuperacion"></div>
+
                 <div class="form-links">
-                    <p><a href="login.php">Volver al inicio de sesión</a></p>
+                    <p><a href="login_view.php">Volver al inicio de sesión</a></p>
                     <p><a href="../../index.php">Volver al inicio</a></p>
                 </div>
             </div>
@@ -46,11 +48,14 @@
             
             const email = document.getElementById('email').value;
             const submitBtn = document.getElementById('submit-btn');
+            const mensajeDiv = document.getElementById('mensaje-recuperacion');
             
             // Deshabilitar botón
             submitBtn.disabled = true;
             submitBtn.textContent = 'Procesando...';
-            
+            mensajeDiv.textContent = '';
+            mensajeDiv.className = '';
+
             try {
                 // Verificar email y generar token
                 const result = await verificarEmailYGenerarToken(email);
@@ -58,6 +63,7 @@
                 if(result.exito) {
                     // Enviar email usando EmailJS
                     enviarEmailRecuperacion(email, result.nombre, result.token);
+                    mostrarMensaje('✅ Enlace de recuperación enviado. Revisa tu bandeja de entrada.', 'success');
                 } else {
                     mostrarMensaje('❌ ' + result.mensaje, 'error');
                 }
@@ -70,6 +76,12 @@
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Enviar Enlace de Recuperación';
             }
+        }
+
+        function mostrarMensaje(msg, tipo) {
+            const mensajeDiv = document.getElementById('mensaje-recuperacion');
+            mensajeDiv.textContent = msg;
+            mensajeDiv.className = tipo === 'success' ? 'success-message' : 'error-message';
         }
     </script>
 </body>

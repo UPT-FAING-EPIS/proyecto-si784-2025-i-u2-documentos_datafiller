@@ -9,6 +9,7 @@ if(!isset($_SESSION['estructura_analizada']) || empty($_SESSION['estructura_anal
 
 $tablas = $_SESSION['estructura_analizada'];
 $db_type = $_SESSION['db_type'] ?? 'sql';
+$plan_usuario = $_SESSION['plan_usuario'] ?? 'gratuito'; // Asegura que el plan esté definido
 ?>
 
 <div class="tab-container">
@@ -124,7 +125,7 @@ $db_type = $_SESSION['db_type'] ?? 'sql';
                                                 <?php 
                                                 $opciones_generacion = [
                                                     'auto_increment' => '🔢 Auto Incremento',
-                                                    'enum_values' => '🎲 Valores ENUM', // ✅ AGREGAR ESTA LÍNEA
+                                                    'enum_values' => '🎲 Valores ENUM',
                                                     'nombre_persona' => '👤 Nombre de Persona',
                                                     'email' => '📧 Email',
                                                     'telefono' => '📞 Teléfono',
@@ -135,12 +136,12 @@ $db_type = $_SESSION['db_type'] ?? 'sql';
                                                     'numero_decimal' => '💰 Número Decimal',
                                                     'texto_aleatorio' => '📝 Texto Aleatorio',
                                                     'booleano' => '✅ Verdadero/Falso',
-                                                    'foreign_key' => '🔗 Clave Foránea', // ✅ AGREGAR TAMBIÉN
+                                                    'foreign_key' => '🔗 Clave Foránea',
                                                     'personalizado' => '🎯 Valor Personalizado'
                                                 ];
                                                 
                                                 foreach($opciones_generacion as $valor => $etiqueta): 
-                                                    $selected = $columna['tipo_generacion'] === $valor ? 'selected' : '';
+                                                    $selected = isset($columna['tipo_generacion']) && $columna['tipo_generacion'] === $valor ? 'selected' : '';
                                                 ?>
                                                     <option value="<?php echo $valor; ?>" <?php echo $selected; ?>>
                                                         <?php echo $etiqueta; ?>

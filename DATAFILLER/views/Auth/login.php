@@ -2,15 +2,16 @@
 session_start();
 
 // Redirigir si ya hay una sesión iniciada
-if(isset($_SESSION['usuario'])) {
+if (isset($_SESSION['usuario'])) {
     header('Location: ../User/generardata.php');
     exit();
 }
 
-// Autoload de Composer (¡muy importante!)
-require_once __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/../config/database.php';
+// Autoload de Composer
+require_once __DIR__ . '/../../vendor/autoload.php';
 
+// Usa el namespace correcto para Database y LoginController
+use App\Config\Database;
 use App\Controllers\LoginController;
 
 // Inicializar la conexión a la base de datos
@@ -24,10 +25,10 @@ $mensaje_error = '';
 $mensaje_exito = '';
 
 // Procesar el formulario si se ha enviado
-if($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $resultado = $loginController->procesarLogin($_POST);
-    
-    if($resultado['exito']) {
+
+    if ($resultado['exito']) {
         header('Location: ../User/generardata.php');
         exit();
     } else {

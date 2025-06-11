@@ -1,21 +1,11 @@
 <?php
-session_start();
+namespace App\Controllers;
 
-// Incluir Faker
-require_once '../vendor/autoload.php';
-require_once '../config/database.php';
-require_once '../models/Usuario.php';
+require_once __DIR__ . '/../vendor/autoload.php'; // <- ¡Esto es necesario!
 
-if(!function_exists('debug_log')) {
-    function debug_log($message) {
-        $timestamp = date('Y-m-d H:i:s');
-        if(!file_exists(__DIR__ . '/../logs')) {
-            mkdir(__DIR__ . '/../logs', 0777, true);
-        }
-        file_put_contents(__DIR__ . '/../logs/debug.log', "[$timestamp] $message\n", FILE_APPEND);
-    }
-}
-
+use App\Config\Database;
+use App\Models\Usuario;
+use App\Controllers\DebugHelper;
 use Faker\Factory as FakerFactory;
 
 class DataGeneratorController {
@@ -32,7 +22,7 @@ class DataGeneratorController {
         $this->db = $database->getConnection();
         $this->usuarioModel = new Usuario($this->db);
     }
-    
+
     public function generarDatos($configuracion, $usuario_id) {
         try {
             // Verificar límites del usuario
@@ -485,7 +475,7 @@ class DataGeneratorController {
         }
     }
     
-    private function obtenerReferenciasForeignKeys($tabla_config) {
+     private function obtenerReferenciasForeignKeys($tabla_config) {
         $referencias = [];
         
         if(!isset($tabla_config['columnas'])) {
@@ -509,7 +499,7 @@ class DataGeneratorController {
                 $cantidad_ref = $cantidades_por_tabla[$tabla_ref] ?? 50;
                 $referencias[$tabla_ref] = range(1, $cantidad_ref);
                 
-                debug_log("FK REAL: {$columna['nombre']} -> $tabla_ref (IDs: 1-$cantidad_ref)");
+                DebugHelper::log("FK REAL: {$columna['nombre']} -> $tabla_ref (IDs: 1-$cantidad_ref)");
             }
         }
         
@@ -542,9 +532,9 @@ class DataGeneratorController {
             $tablas_ordenadas[] = $tabla;
         }
         
-        debug_log("ORDEN DE GENERACIÓN:");
+        DebugHelper::log("ORDEN DE GENERACIÓN:");
         foreach($tablas_ordenadas as $i => $tabla) {
-            debug_log("$i. {$tabla['nombre']}");
+            DebugHelper::log("$i. {$tabla['nombre']}");
         }
         
         return $tablas_ordenadas;
@@ -552,8 +542,9 @@ class DataGeneratorController {
 }
 
 // Procesar la solicitud
-if($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if(!isset($_SESSION['usuario'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    session_start();
+    if (!isset($_SESSION['usuario'])) {
         header('Location: ../views/Auth/login.php');
         exit();
     }
@@ -568,21 +559,17 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
     ];
     
     // Procesar cada tabla
-    foreach($_POST['tabla_nombre'] as $index => $nombre_tabla) {
+    foreach ($_POST['tabla_nombre'] as $index => $nombre_tabla) {
         $cantidad = intval($_POST['cantidad'][$index] ?? 50);
-        
-        // Obtener información de columnas
         $columnas = [];
         $tipos_generacion = [];
         $valores_personalizados = [];
-        
-        foreach($_POST['columna_info'][$index] as $col_index => $columna_json) {
+        foreach ($_POST['columna_info'][$index] as $col_index => $columna_json) {
             $columna = json_decode($columna_json, true);
             $columnas[] = $columna;
             $tipos_generacion[$col_index] = $_POST['tipo_generacion'][$index][$col_index] ?? $columna['tipo_generacion'];
             $valores_personalizados[$col_index] = $_POST['valor_personalizado'][$index][$col_index] ?? null;
         }
-        
         $configuracion['tablas'][] = [
             'nombre' => $nombre_tabla,
             'cantidad' => $cantidad,
@@ -597,11 +584,11 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
     $generator = new DataGeneratorController($configuracion['idioma_datos']);
     $resultado = $generator->generarDatos($configuracion, $_SESSION['usuario']['id']);
     
-    if($resultado['exito']) {
+    if ($resultado['exito']) {
         $_SESSION['exito'] = "¡Datos generados exitosamente! " . 
-                           "{$resultado['estadisticas']['total_registros']} registros en " .
-                           "{$resultado['estadisticas']['total_tablas']} tablas. " .
-                           "Tiempo: {$resultado['estadisticas']['tiempo_generacion']}s";
+                         "{$resultado['estadisticas']['total_registros']} registros en " .
+                         "{$resultado['estadisticas']['total_tablas']} tablas. " .
+                         "Tiempo: {$resultado['estadisticas']['tiempo_generacion']}s";
         header('Location: ../views/User/resultados.php');
     } else {
         $_SESSION['error'] = $resultado['mensaje'];

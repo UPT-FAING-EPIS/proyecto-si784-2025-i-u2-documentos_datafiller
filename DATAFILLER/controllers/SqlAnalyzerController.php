@@ -1,7 +1,5 @@
 <?php
-session_start();
-
-// ✅ CREAR LOG EN EL PROYECTO
+namespace App\Controllers;
 if(!file_exists(__DIR__ . '/../logs')) {
     mkdir(__DIR__ . '/../logs', 0777, true);
 }
@@ -12,11 +10,12 @@ function debug_log($message) {
     file_put_contents(__DIR__ . '/../logs/debug.log', "[$timestamp] $message\n", FILE_APPEND);
 }
 
-require_once '../config/database.php';
-require_once '../models/Usuario.php';
-require_once 'FileProcessorController.php';
-require_once '../vendor/autoload.php';
+// Usa autoload de Composer y namespaces modernos
+require_once __DIR__ . '/../vendor/autoload.php';
 
+use App\Config\Database;
+use App\Models\Usuario;
+use App\Controllers\FileProcessorController;
 use PhpMyAdmin\SqlParser\Parser;
 use PhpMyAdmin\SqlParser\Components\CreateDefinition;
 use PhpMyAdmin\SqlParser\Statements\CreateStatement;
@@ -24,12 +23,14 @@ use PhpMyAdmin\SqlParser\Statements\CreateStatement;
 class SqlAnalyzerController {
     private $db;
     private $usuarioModel;
-    
+
     public function __construct() {
         $database = new Database();
         $this->db = $database->getConnection();
         $this->usuarioModel = new Usuario($this->db);
     }
+
+
     
     public function analizarEstructura($script, $dbType, $usuario_id) {
         try {
@@ -594,9 +595,9 @@ class SqlAnalyzerController {
         }
     }
 }
-
 // Procesar la solicitud
 if($_SERVER['REQUEST_METHOD'] === 'POST') {
+    session_start();
     if(!isset($_SESSION['usuario'])) {
         $_SESSION['error'] = 'Debe iniciar sesión para usar esta funcionalidad.';
         header('Location: ../views/Auth/login.php');

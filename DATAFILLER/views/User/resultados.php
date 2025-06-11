@@ -11,7 +11,7 @@ $datos_generados = $_SESSION['datos_generados'];
 $estadisticas = $_SESSION['estadisticas_generacion'] ?? [];
 $formato_salida = $_SESSION['formato_salida'] ?? 'sql';
 
-// Función helper para formatear tamaño de archivo (MOVER AL INICIO)
+// Función helper para formatear tamaño de archivo
 function formatFileSize($bytes) {
     if ($bytes >= 1073741824) {
         return number_format($bytes / 1073741824, 2) . ' GB';
@@ -131,7 +131,6 @@ function formatFileSize($bytes) {
             <div class="preview-header">
                 <h3>👁️ Vista Previa del Contenido Generado</h3>
                 <div class="preview-info">
-                    <!-- ✅ CORREGIDO: Quitar $this-> -->
                     <span class="file-size">Tamaño: <span id="fileSize"><?php echo formatFileSize(strlen($datos_generados)); ?></span></span>
                     <span class="file-lines">Líneas: <span id="lineCount"><?php echo number_format(substr_count($datos_generados, "\n") + 1); ?></span></span>
                 </div>

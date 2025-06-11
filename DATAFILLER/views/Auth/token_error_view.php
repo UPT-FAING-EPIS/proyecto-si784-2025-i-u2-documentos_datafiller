@@ -24,7 +24,7 @@
                 
                 <div class="form-links">
                     <p><a href="recuperar_password.php" class="btn">Solicitar Nuevo Enlace</a></p>
-                    <p><a href="login.php">Volver al inicio de sesión</a></p>
+                    <p><a href="login_view.php">Volver al inicio de sesión</a></p>
                 </div>
             </div>
         </div>

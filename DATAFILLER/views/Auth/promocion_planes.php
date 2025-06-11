@@ -3,11 +3,13 @@ session_start();
 
 // Verificar que el usuario esté logueado
 if(!isset($_SESSION['usuario'])) {
-    header('Location: login.php');
+    header('Location: login_view.php');
     exit();
 }
 
-require_once '../../config/database.php';
+require_once __DIR__ . '/../../vendor/autoload.php'; // Usa autoload de Composer
+
+use App\Config\Database;
 
 // Obtener información de los planes
 $database = new Database();

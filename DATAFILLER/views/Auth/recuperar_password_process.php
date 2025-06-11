@@ -1,10 +1,13 @@
 <?php
 header('Content-Type: application/json');
 
-require_once '../../config/database.php';
-require_once '../../models/Usuario.php';
+// Usa el autoload de Composer y namespaces modernos
+require_once __DIR__ . '/../../vendor/autoload.php';
 
-if($_SERVER['REQUEST_METHOD'] !== 'POST') {
+use App\Config\Database;
+use App\Models\Usuario;
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(['exito' => false, 'mensaje' => 'Método no permitido']);
     exit();
 }
@@ -13,7 +16,7 @@ if($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $json = file_get_contents('php://input');
 $data = json_decode($json, true);
 
-if(!isset($data['email']) || empty($data['email'])) {
+if (!isset($data['email']) || empty($data['email'])) {
     echo json_encode(['exito' => false, 'mensaje' => 'Email requerido']);
     exit();
 }
@@ -26,7 +29,7 @@ try {
     // Verificar si el email existe
     $usuario = $usuarioModel->buscarPorEmail($data['email']);
     
-    if(!$usuario) {
+    if (!$usuario) {
         echo json_encode([
             'exito' => false, 
             'mensaje' => 'No existe una cuenta asociada a este email.'
@@ -39,7 +42,7 @@ try {
     $expiracion = date('Y-m-d H:i:s', strtotime('+1 hour'));
     
     // Guardar token en base de datos
-    if($usuarioModel->guardarTokenRecuperacion($usuario['id'], $token, $expiracion)) {
+    if ($usuarioModel->guardarTokenRecuperacion($usuario['id'], $token, $expiracion)) {
         echo json_encode([
             'exito' => true,
             'nombre' => $usuario['nombre'],
@@ -53,7 +56,7 @@ try {
         ]);
     }
     
-} catch(Exception $e) {
+} catch (Exception $e) {
     error_log("Error en recuperación: " . $e->getMessage());
     echo json_encode([
         'exito' => false,

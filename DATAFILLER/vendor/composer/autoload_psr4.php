@@ -6,7 +6,7 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    'Tests\\' => array($baseDir . '/../tests'),
+    'Tests\\' => array($baseDir . '/tests'),
     'Symfony\\Polyfill\\Php80\\' => array($vendorDir . '/symfony/polyfill-php80'),
     'Symfony\\Polyfill\\Mbstring\\' => array($vendorDir . '/symfony/polyfill-mbstring'),
     'Psr\\Container\\' => array($vendorDir . '/psr/container/src'),
@@ -16,4 +16,5 @@ return array(
     'DeepCopy\\' => array($vendorDir . '/myclabs/deep-copy/src/DeepCopy'),
     'App\\Models\\' => array($baseDir . '/models'),
     'App\\Controllers\\' => array($baseDir . '/controllers'),
+    'App\\Config\\' => array($baseDir . '/config'),
 );

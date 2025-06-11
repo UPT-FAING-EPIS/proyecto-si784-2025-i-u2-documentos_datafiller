@@ -8,7 +8,7 @@
     </div>
     
     <div class="tab-content">
-        <!-- AGREGAR ESTOS MENSAJES -->
+        <!-- MENSAJES DE ÉXITO/ERROR -->
         <?php if(isset($_SESSION['exito'])): ?>
             <div class="success-message">
                 <?php echo $_SESSION['exito']; unset($_SESSION['exito']); ?>
@@ -42,9 +42,8 @@
             <h2 class="content-title">Ingrese su script de definición de tablas:</h2>
         <?php endif; ?>
         
-        <!-- CAMBIAR ESTA LÍNEA: -->
         <form action="../../controllers/SqlAnalyzerController.php" method="post" enctype="multipart/form-data">
-            <!-- NUEVA SECCIÓN: Selector de archivos -->
+            <!-- SECCIÓN: Selector de archivos -->
             <div class="file-upload-section">
                 <h3>📁 Opción 1: Subir archivo de base de datos</h3>
                 <div class="file-upload-container">
@@ -90,7 +89,7 @@
                 <div class="separator-line"></div>
             </div>
 
-            <!-- SECCIÓN EXISTENTE: Textarea manual -->
+            <!-- SECCIÓN: Textarea manual -->
             <div class="manual-input-section">
                 <h3>✍️ Opción 2: Escribir/Pegar script manualmente</h3>
                 <div class="form-group">
