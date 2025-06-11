@@ -14,7 +14,8 @@ variable "db_password" {
   sensitive   = true
 }
 
-variable "storage_mb" {
-  default     = 42600 # equivalente a 41.6 GB
-  description = "Maximo almacenamiento para MySQL Flexible Server"
+variable "storage_gb" {
+  default     = 42
+  description = "Máximo almacenamiento para MySQL Flexible Server (GB)"
 }
+

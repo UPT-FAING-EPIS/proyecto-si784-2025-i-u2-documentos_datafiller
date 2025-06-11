@@ -14,9 +14,13 @@ resource "azurerm_mysql_flexible_server" "mysql" {
   administrator_login    = var.db_username
   administrator_password = var.db_password
   sku_name               = "B_Standard_B1ms"
-  storage_mb             = var.storage_mb
   version                = "8.0"
+
+  storage {
+    size_gb = var.storage_gb
+  }
 }
+
 
 output "db_fqdn" {
   value = azurerm_mysql_flexible_server.mysql.fqdn
