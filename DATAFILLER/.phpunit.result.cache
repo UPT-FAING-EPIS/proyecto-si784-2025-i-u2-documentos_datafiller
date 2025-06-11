@@ -1,0 +1,1 @@
+{"version":1,"defects":[],"times":{"UsuarioTest::testCrearUsuario":0.005,"UsuarioTest::testValidarEmail":0.001,"UsuarioTest::testPropiedadesUsuario":0.001,"UsuarioTest::testBuscarPorNombreConMock":0.008,"UsuarioTest::testBuscarPorEmailConMock":0,"UsuarioTest::testObtenerPlanUsuario":0,"UsuarioTest::testExisteUsuario":0}}

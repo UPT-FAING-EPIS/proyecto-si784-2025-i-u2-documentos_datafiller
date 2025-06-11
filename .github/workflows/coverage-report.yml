@@ -1,0 +1,142 @@
+name: Coverage Report
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: test_datafiller
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        extensions: mbstring, xml, ctype, iconv, intl, pdo, pdo_mysql, dom, filter, gd, iconv, json, mbstring, xdebug
+        coverage: xdebug
+    
+    - name: Cache Composer packages
+      id: composer-cache
+      uses: actions/cache@v3
+      with:
+        path: vendor
+        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-php-
+
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-progress
+
+    - name: Setup test database
+      run: |
+        mysql -h 127.0.0.1 -u root -proot -e "CREATE DATABASE IF NOT EXISTS test_datafiller;"
+        mysql -h 127.0.0.1 -u root -proot test_datafiller < database/test_schema.sql || echo "No schema file found"
+      
+    - name: Run tests with coverage
+      env:
+        DB_HOST: 127.0.0.1
+        DB_NAME: test_datafiller
+        DB_USER: root
+        DB_PASS: root
+      run: |
+        mkdir -p coverage
+        vendor/bin/phpunit --coverage-html coverage --coverage-clover coverage.xml --coverage-text --colors=never
+
+    - name: Check coverage threshold
+      run: |
+        COVERAGE=$(php -r "
+        \$xml = simplexml_load_file('coverage.xml');
+        \$metrics = \$xml->project->metrics;
+        \$percentage = (\$metrics['coveredstatements'] / \$metrics['statements']) * 100;
+        echo number_format(\$percentage, 2);
+        ")
+        echo "Coverage: $COVERAGE%"
+        if (( $(echo "$COVERAGE >= 70" | bc -l) )); then
+          echo "✅ Coverage $COVERAGE% meets minimum requirement of 70%"
+          echo "COVERAGE_PASSED=true" >> $GITHUB_ENV
+          echo "COVERAGE_PERCENTAGE=$COVERAGE" >> $GITHUB_ENV
+        else
+          echo "❌ Coverage $COVERAGE% is below minimum requirement of 70%"
+          echo "COVERAGE_PASSED=false" >> $GITHUB_ENV
+          echo "COVERAGE_PERCENTAGE=$COVERAGE" >> $GITHUB_ENV
+          exit 1
+        fi
+
+    - name: Generate coverage badge
+      if: env.COVERAGE_PASSED == 'true'
+      run: |
+        COVERAGE=${{ env.COVERAGE_PERCENTAGE }}
+        COLOR="red"
+        if (( $(echo "$COVERAGE >= 90" | bc -l) )); then
+          COLOR="brightgreen"
+        elif (( $(echo "$COVERAGE >= 80" | bc -l) )); then
+          COLOR="yellow"
+        elif (( $(echo "$COVERAGE >= 70" | bc -l) )); then
+          COLOR="orange"
+        fi
+        
+        curl -o coverage/badge.svg "https://img.shields.io/badge/coverage-${COVERAGE}%25-${COLOR}"
+
+    - name: Upload coverage reports to Codecov
+      if: env.COVERAGE_PASSED == 'true'
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+
+    - name: Deploy to GitHub Pages
+      if: env.COVERAGE_PASSED == 'true' && github.ref == 'refs/heads/main'
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./coverage
+        destination_dir: coverage
+        
+    - name: Comment PR with coverage
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const coverage = '${{ env.COVERAGE_PERCENTAGE }}';
+          const passed = '${{ env.COVERAGE_PASSED }}' === 'true';
+          const emoji = passed ? '✅' : '❌';
+          const status = passed ? 'PASSED' : 'FAILED';
+          
+          const comment = `
+          ## ${emoji} Coverage Report ${status}
+          
+          **Coverage:** ${coverage}%
+          **Minimum Required:** 70%
+          **Status:** ${status}
+          
+          ${passed ? 
+            `🎉 Great job! Coverage meets the minimum requirement.
+            
+          📊 [View detailed coverage report](https://yourusername.github.io/yourrepo/coverage/)` :
+            `⚠️ Coverage is below the minimum requirement of 70%.
+            
+          Please add more tests to improve coverage.`}
+          `;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });
