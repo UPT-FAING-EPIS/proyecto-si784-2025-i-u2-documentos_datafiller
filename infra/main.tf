@@ -19,7 +19,7 @@ resource "azurerm_mysql_flexible_server" "mysql" {
   storage {
     size_gb = var.storage_gb
   }
-}
+} 
 
 
 output "db_fqdn" {
