@@ -15,5 +15,5 @@ output "mysql_location" {
 
 output "mysql_storage_gb" {
   description = "Almacenamiento asignado en GB"
-  value       = azurerm_mysql_flexible_server.mysql.storage_mb / 1024
+  value = var.storage_gb
 }
