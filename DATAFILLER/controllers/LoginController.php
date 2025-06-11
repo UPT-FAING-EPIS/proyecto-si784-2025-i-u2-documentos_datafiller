@@ -1,5 +1,5 @@
 <?php
-require_once 'models/Usuario.php';
+require_once __DIR__ . '/../models/Usuario.php';
 
 class LoginController {
     private $usuarioModel;
@@ -27,8 +27,13 @@ class LoginController {
         $resultado = $this->usuarioModel->validarLogin($nombre, $password);
         
         if($resultado['exito']) {
-            // Iniciar sesión
-            $_SESSION['usuario'] = $resultado['usuario'];
+            // Iniciar sesión con toda la información necesaria INCLUYENDO EL ID
+            $_SESSION['usuario'] = [
+                'id' => $resultado['usuario']['id'], // ¡AQUÍ ESTÁ LA CLAVE!
+                'nombre' => $resultado['usuario']['nombre'],
+                'apellido_paterno' => $resultado['usuario']['apellido_paterno'],
+                'email' => $resultado['usuario']['email']
+            ];
             
             return [
                 'exito' => true,

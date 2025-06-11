@@ -1,0 +1,324 @@
+/* Estilos específicos para el header */
+.main-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+    position: relative;
+    overflow: hidden;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    color: white;
+}
+
+.main-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    animation: headerShine 4s ease-in-out infinite;
+}
+
+@keyframes headerShine {
+    0%, 100% { left: -100%; }
+    50% { left: 100%; }
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    z-index: 1001;
+}
+
+.logo-container img {
+    height: 40px;
+    margin-right: 1rem;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+    transition: transform 0.3s ease;
+}
+
+.logo-container:hover img {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.logo-container h1 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+}
+
+.main-nav {
+    position: relative;
+    z-index: 1001;
+}
+
+.main-nav ul {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.main-nav li {
+    margin: 0 1rem;
+    position: relative;
+}
+
+.main-nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    position: relative;
+    padding: 0.5rem 0;
+}
+
+.main-nav a::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: #FFD700;
+    transition: width 0.3s ease;
+}
+
+.main-nav a:hover::after {
+    width: 100%;
+}
+
+/* DROPDOWN STYLES - VERSIÓN SIMPLIFICADA Y FUNCIONAL */
+.dropdown {
+    position: relative;
+}
+
+.dropdown-toggle {
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.3s ease;
+}
+
+.dropdown:hover .dropdown-toggle {
+    color: #FFD700;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 10px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    padding: 1.5rem;
+    min-width: 280px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 9999;
+    border: 1px solid #e9ecef;
+}
+
+/* FLECHA DEL DROPDOWN */
+.dropdown-menu::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    right: 20px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid white;
+}
+
+/* MOSTRAR DROPDOWN AL HACER HOVER */
+.dropdown:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* CONTENIDO DEL DROPDOWN */
+.plan-info {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.plan-info strong {
+    display: block;
+    color: #667eea;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+.consultas-info {
+    font-size: 0.9rem;
+    color: #495057;
+    background: white;
+    padding: 0.5rem 0.8rem;
+    border-radius: 20px;
+    display: inline-block;
+    border: 1px solid #dee2e6;
+}
+
+.dropdown-menu hr {
+    border: none;
+    border-top: 2px solid #e9ecef;
+    margin: 1rem 0;
+    opacity: 0.7;
+}
+
+.dropdown-menu a {
+    display: block;
+    color: #495057;
+    text-decoration: none;
+    padding: 0.75rem 0;
+    transition: all 0.3s ease;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.dropdown-menu a:hover {
+    color: #667eea;
+    background: #f8f9fa;
+    padding-left: 0.5rem;
+}
+
+.upgrade-link {
+    background: linear-gradient(45deg, #667eea, #764ba2) !important;
+    color: white !important;
+    padding: 0.75rem 1rem !important;
+    border-radius: 8px !important;
+    text-align: center;
+    font-weight: 600;
+    margin-top: 0.5rem;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    transition: all 0.3s ease;
+}
+
+.upgrade-link:hover {
+    background: linear-gradient(45deg, #5a6fd8, #6a4190) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    padding-left: 1rem !important;
+}
+
+/* USER INFO STYLES */
+.register-btn {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    z-index: 1001;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    color: white;
+    gap: 1rem;
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.user-name {
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.user-plan {
+    font-size: 0.8rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    margin-top: 0.2rem;
+}
+
+.plan-gratuito {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+.plan-premium {
+    background-color: #FFD700;
+    color: #333;
+    font-weight: 600;
+}
+
+.logout-btn {
+    background-color: transparent;
+    border: 1px solid white;
+    color: white;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.3s;
+}
+
+.logout-btn:hover {
+    background-color: white;
+    color: #667eea;
+}
+
+.register-btn .btn {
+    background-color: white;
+    color: #667eea;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.register-btn .btn:hover {
+    background-color: #e3f2fd;
+    transform: translateY(-2px);
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .main-header {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+    }
+    
+    .main-nav ul {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+    }
+    
+    .dropdown-menu {
+        right: -20px;
+        min-width: 250px;
+        max-width: calc(100vw - 40px);
+    }
+    
+    .dropdown-menu::before {
+        right: 40px;
+    }
+    
+    .user-details {
+        align-items: center;
+    }
+    
+    .user-info {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}

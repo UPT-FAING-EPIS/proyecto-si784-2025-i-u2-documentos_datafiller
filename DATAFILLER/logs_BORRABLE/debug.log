@@ -1,0 +1,12 @@
+[2025-06-10 22:36:18] ORDEN DE GENERACIÓN:
+[2025-06-10 22:36:18] 0. tbmascotas
+[2025-06-10 22:36:18] 1. tbusuario
+[2025-06-10 22:36:18] 2. tbrelacion
+[2025-06-10 22:36:18] FK REAL: id_dueno -> tbusuario (IDs: 1-50)
+[2025-06-10 22:36:18] FK REAL: id_mascota -> tbmascotas (IDs: 1-50)
+[2025-06-10 23:01:14] ORDEN DE GENERACIÓN:
+[2025-06-10 23:01:14] 0. tbmascotas
+[2025-06-10 23:01:14] 1. tbusuario
+[2025-06-10 23:01:14] 2. tbrelacion
+[2025-06-10 23:01:14] FK REAL: id_dueno -> tbusuario (IDs: 1-50)
+[2025-06-10 23:01:14] FK REAL: id_mascota -> tbmascotas (IDs: 1-50)

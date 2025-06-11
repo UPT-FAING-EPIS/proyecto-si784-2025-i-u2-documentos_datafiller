@@ -1,0 +1,291 @@
+/* Estilos para la página de promoción de planes */
+
+.promocion-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Header */
+.promo-header {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: white;
+}
+
+.header-content .logo {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 1rem;
+}
+
+.promo-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+.promo-header p {
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+
+/* Planes Section */
+.planes-section {
+    padding: 2rem 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.planes-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.plan-card {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    position: relative;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.plan-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+.plan-badge {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #4CAF50;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.plan-badge.popular {
+    background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+}
+
+.plan-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.plan-header h2 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.precio {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+}
+
+.precio-numero {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #2196F3;
+}
+
+.precio-periodo {
+    font-size: 1rem;
+    color: #666;
+    margin-left: 0.5rem;
+}
+
+.plan-features ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.plan-features li {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 1rem;
+}
+
+.plan-features li:last-child {
+    border-bottom: none;
+}
+
+.plan-footer {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.btn-plan {
+    display: inline-block;
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.btn-current {
+    background: #4CAF50;
+    color: white;
+}
+
+.btn-current:hover {
+    background: #45a049;
+}
+
+.btn-premium {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+}
+
+.btn-premium:hover {
+    background: linear-gradient(45deg, #5a6fd8, #6a4190);
+    transform: translateY(-2px);
+}
+
+.plan-note {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 1rem;
+}
+
+/* Premium card destacado */
+.premium {
+    border: 3px solid #667eea;
+}
+
+/* Comparación Section */
+.comparacion-section {
+    background: white;
+    padding: 3rem 1rem;
+    margin: 2rem 0;
+}
+
+.comparacion-section h2 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    color: #333;
+}
+
+.tabla-comparacion {
+    max-width: 800px;
+    margin: 0 auto;
+    overflow-x: auto;
+}
+
+.tabla-comparacion table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.tabla-comparacion th,
+.tabla-comparacion td {
+    padding: 1rem;
+    text-align: center;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.tabla-comparacion th {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+    font-weight: 600;
+}
+
+.tabla-comparacion tr:nth-child(even) {
+    background: #f8f9fa;
+}
+
+/* CTA Section */
+.cta-section {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: white;
+}
+
+.cta-content h2 {
+    font-size: 2.2rem;
+    margin-bottom: 1rem;
+}
+
+.cta-content p {
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
+
+.cta-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-cta {
+    display: inline-block;
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    min-width: 200px;
+}
+
+.btn-cta.primary {
+    background: white;
+    color: #667eea;
+}
+
+.btn-cta.primary:hover {
+    background: #f0f0f0;
+    transform: translateY(-2px);
+}
+
+.btn-cta.secondary {
+    background: transparent;
+    color: white;
+    border: 2px solid white;
+}
+
+.btn-cta.secondary:hover {
+    background: white;
+    color: #667eea;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .promo-header h1 {
+        font-size: 2rem;
+    }
+    
+    .planes-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .cta-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .btn-cta {
+        min-width: 250px;
+    }
+}
