@@ -1,5 +1,7 @@
 <?php
-require_once __DIR__ . '/../models/Usuario.php';
+namespace App\Controllers;
+
+use App\Models\Usuario;
 
 class LoginController {
     private $usuarioModel;
@@ -29,7 +31,7 @@ class LoginController {
         if($resultado['exito']) {
             // Iniciar sesión con toda la información necesaria INCLUYENDO EL ID
             $_SESSION['usuario'] = [
-                'id' => $resultado['usuario']['id'], // ¡AQUÍ ESTÁ LA CLAVE!
+                'id' => $resultado['usuario']['id'],
                 'nombre' => $resultado['usuario']['nombre'],
                 'apellido_paterno' => $resultado['usuario']['apellido_paterno'],
                 'email' => $resultado['usuario']['email']
