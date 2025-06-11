@@ -17,5 +17,9 @@
             "App\\Controllers\\": "controllers/",
             "App\\Models\\": "models/"
         }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
     }
 }
