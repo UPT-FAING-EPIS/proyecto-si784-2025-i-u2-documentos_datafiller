@@ -22,6 +22,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        submodules: false
+        fetch-depth: 0
     
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
@@ -30,21 +33,21 @@ jobs:
         extensions: mbstring, xml, ctype, iconv, intl, pdo, pdo_mysql, dom, filter, gd, iconv, json, mbstring, xdebug
         coverage: xdebug
     
-    - name: Fix submodule issues
+    - name: Clean up git submodules
       run: |
-        # Remove any problematic .gitmodules entries
+        # Remove problematic .gitmodules file if it exists
         if [ -f ".gitmodules" ]; then
-          echo "Found .gitmodules file, checking contents:"
+          echo "Found .gitmodules file, removing it:"
           cat .gitmodules
-          # Remove the file if it contains vendor references
-          if grep -q "vendor/" .gitmodules; then
-            echo "Removing .gitmodules with vendor references"
-            rm .gitmodules
-          fi
+          rm .gitmodules
+          git add .gitmodules 2>/dev/null || true
         fi
-        # Clean up any submodule references
-        git config --file .gitmodules --remove-section submodule.DATAFILLER/vendor/myclabs/deep-copy 2>/dev/null || true
-        git add . 2>/dev/null || true
+        
+        # Remove any git submodule cache
+        rm -rf .git/modules 2>/dev/null || true
+        
+        # Clean git config
+        git config --remove-section submodule.DATAFILLER/vendor/myclabs/deep-copy 2>/dev/null || true
     
     - name: Verify DATAFILLER directory structure
       run: |
