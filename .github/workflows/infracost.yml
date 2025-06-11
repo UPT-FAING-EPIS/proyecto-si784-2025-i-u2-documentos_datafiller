@@ -22,14 +22,6 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Set ARM environment variables
-        run: |
-          echo "${{ secrets.AZURE_CREDENTIALS }}" > azure.json
-          echo "ARM_CLIENT_ID=$(jq -r .clientId azure.json)" >> $GITHUB_ENV
-          echo "ARM_CLIENT_SECRET=$(jq -r .clientSecret azure.json)" >> $GITHUB_ENV
-          echo "ARM_SUBSCRIPTION_ID=$(jq -r .subscriptionId azure.json)" >> $GITHUB_ENV
-          echo "ARM_TENANT_ID=$(jq -r .tenantId azure.json)" >> $GITHUB_ENV
-
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
@@ -37,9 +29,19 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
+        env:
+          ARM_CLIENT_ID: ${{ fromJSON(secrets.AZURE_CREDENTIALS).clientId }}
+          ARM_CLIENT_SECRET: ${{ fromJSON(secrets.AZURE_CREDENTIALS).clientSecret }}
+          ARM_SUBSCRIPTION_ID: ${{ fromJSON(secrets.AZURE_CREDENTIALS).subscriptionId }}
+          ARM_TENANT_ID: ${{ fromJSON(secrets.AZURE_CREDENTIALS).tenantId }}
 
       - name: Terraform Plan
         run: terraform plan -out=tfplan
+        env:
+          ARM_CLIENT_ID: ${{ fromJSON(secrets.AZURE_CREDENTIALS).clientId }}
+          ARM_CLIENT_SECRET: ${{ fromJSON(secrets.AZURE_CREDENTIALS).clientSecret }}
+          ARM_SUBSCRIPTION_ID: ${{ fromJSON(secrets.AZURE_CREDENTIALS).subscriptionId }}
+          ARM_TENANT_ID: ${{ fromJSON(secrets.AZURE_CREDENTIALS).tenantId }}
 
       - name: Install Infracost CLI
         run: |
@@ -47,7 +49,9 @@ jobs:
           echo "$HOME/.infracost/bin" >> $GITHUB_PATH
 
       - name: Setup Infracost API Key
-        run: echo "INFRACOST_API_KEY=${{ secrets.INFRACOST_API_KEY }}" >> $GITHUB_ENV
+        env:
+          INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}
+        run: echo "Infracost API key configurado"
 
       - name: Generate cost estimate
         run: |
