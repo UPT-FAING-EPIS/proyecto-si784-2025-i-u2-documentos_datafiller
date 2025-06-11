@@ -10,6 +10,11 @@ jobs:
   coverage:
     runs-on: ubuntu-latest
     
+    # Configurar directorio de trabajo
+    defaults:
+      run:
+        working-directory: ./DATAFILLER
+    
     services:
       mysql:
         image: mysql:8.0
@@ -34,8 +39,8 @@ jobs:
       id: composer-cache
       uses: actions/cache@v3
       with:
-        path: vendor
-        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+        path: DATAFILLER/vendor
+        key: ${{ runner.os }}-php-${{ hashFiles('DATAFILLER/composer.lock') }}
         restore-keys: |
           ${{ runner.os }}-php-
 
@@ -45,7 +50,8 @@ jobs:
     - name: Setup test database
       run: |
         mysql -h 127.0.0.1 -u root -proot -e "CREATE DATABASE IF NOT EXISTS test_datafiller;"
-        mysql -h 127.0.0.1 -u root -proot test_datafiller < database/test_schema.sql || echo "No schema file found"
+        # Si tienes un schema SQL, ajusta la ruta
+        # mysql -h 127.0.0.1 -u root -proot test_datafiller < database/test_schema.sql || echo "No schema file found"
       
     - name: Run tests with coverage
       env:
@@ -96,7 +102,7 @@ jobs:
       if: env.COVERAGE_PASSED == 'true'
       uses: codecov/codecov-action@v3
       with:
-        file: ./coverage.xml
+        file: ./DATAFILLER/coverage.xml
         flags: unittests
         name: codecov-umbrella
 
@@ -105,7 +111,7 @@ jobs:
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./coverage
+        publish_dir: ./DATAFILLER/coverage
         destination_dir: coverage
         
     - name: Comment PR with coverage
