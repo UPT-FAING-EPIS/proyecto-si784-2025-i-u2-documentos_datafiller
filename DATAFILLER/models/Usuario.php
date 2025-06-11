@@ -1,6 +1,8 @@
 <?php
-// Cambiar la ruta del require_once
-require_once __DIR__ . '/../config/database.php';
+namespace App\Models;
+
+use PDO;
+use PDOException;
 
 class Usuario {
     private $conn;
@@ -20,6 +22,7 @@ class Usuario {
     public function __construct($db) {
         $this->conn = $db;
     }
+
     
     // Crear nuevo usuario
     public function crear() {

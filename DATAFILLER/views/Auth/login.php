@@ -7,8 +7,11 @@ if(isset($_SESSION['usuario'])) {
     exit();
 }
 
-require_once '../../config/database.php';
-require_once '../../controllers/LoginController.php';
+// Autoload de Composer (¡muy importante!)
+require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../config/database.php';
+
+use App\Controllers\LoginController;
 
 // Inicializar la conexión a la base de datos
 $database = new Database();
