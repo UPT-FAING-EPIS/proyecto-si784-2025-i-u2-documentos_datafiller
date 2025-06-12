@@ -14,11 +14,6 @@
     "content": [
       {
         "files": ["*.md", "manual/*.md", "api/*.yml"]
-      },
-      {
-        "files": ["../FD*.md"],
-        "src": ".",
-        "dest": "informes"
       }
     ],
     "resource": [

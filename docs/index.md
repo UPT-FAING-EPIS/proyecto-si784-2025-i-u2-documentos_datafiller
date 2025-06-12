@@ -13,11 +13,12 @@ DATAFILLER es un sistema web desarrollado en PHP para la gestión integral de do
 ## 📚 Documentación Disponible
 
 ### Informes del Proyecto
-- [📄 FD01 - Informe de Factibilidad](informes/FD01-EPIS-Informe%20de%20Factibilidad.md)
+- [📄 FD01 - Informe de Factibilidad](informes/fd01-informe-factibilidad.md)
 
 ### Manuales Técnicos
 - [📖 Manual de Usuario](manual/user-manual.md)
 - [🔧 Documentación Técnica](manual/technical.md)
+- [📋 FD05 - Informe de Documentación](manual/fd05-informe.md)
 
 ### Enlaces del Sistema
 - **Producción:** https://datafiller3.sytes.net/
