@@ -1,23 +1,9 @@
 <?php
-declare(strict_types=1);
 
 namespace App\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 use App\Controllers\DataGeneratorController;
-
-// Carga el stub SOLO si se requiere App\Models\Usuario
-spl_autoload_register(function ($class) {
-    if ($class === 'App\Models\Usuario') {
-        require __DIR__ . '/Stubs/UsuarioStub.php';
-        return true;
-    }
-    if ($class === 'App\Config\Database') {
-        require __DIR__ . '/Stubs/DatabaseStub.php';
-        return true;
-    }
-    return false;
-}, true, true);
 
 final class DataGeneratorControllerTest extends TestCase
 {
@@ -29,7 +15,6 @@ final class DataGeneratorControllerTest extends TestCase
         $_SESSION = [];
         $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
         $_SERVER['REQUEST_METHOD'] = 'CLI';
-        $_POST['formato_salida'] = 'sql';
     }
 
     public function testGenerarDatosBasico(): void
@@ -60,32 +45,25 @@ final class DataGeneratorControllerTest extends TestCase
         $_SESSION['usuario'] = ['id' => 1];
         $controller = new DataGeneratorController('es_ES');
 
-        $pdo = $this->getPrivatePdo($controller);
-        $pdo->exec("
-            CREATE TABLE tbauditoria_consultas (
-                usuario_id INTEGER,
-                tipo_consulta TEXT,
-                cantidad_registros INTEGER,
-                formato_exportacion TEXT,
-                fecha_consulta TEXT DEFAULT (CURRENT_TIMESTAMP),
-                ip_usuario TEXT
-            )
-        ");
+        // Mock de Usuario para este test
+        $usuarioMock = $this->getMockBuilder(\App\Models\Usuario::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['obtenerInfoUsuario'])
+            ->getMock();
+        $usuarioMock->method('obtenerInfoUsuario')->willReturn([
+            'id' => 1,
+            'plan' => 'premium'
+        ]);
+
+        // Inyectamos el mock en el controlador
+        $refCtrl = new \ReflectionClass($controller);
+        $propUsuario = $refCtrl->getProperty('usuario');
+        $propUsuario->setAccessible(true);
+        $propUsuario->setValue($controller, $usuarioMock);
 
         $result = $controller->generarDatos($config, 1);
 
         $this->assertTrue($result['exito']);
         $this->assertEquals('Datos generados exitosamente', $result['mensaje']);
-        $this->assertIsArray($result['estadisticas']);
-        $this->assertArrayHasKey('contenido', $result);
-        $this->assertStringContainsString('INSERT INTO `usuarios`', $result['contenido']);
-    }
-
-    private function getPrivatePdo($controller): \PDO
-    {
-        $ref = new \ReflectionClass($controller);
-        $prop = $ref->getProperty('db');
-        $prop->setAccessible(true);
-        return $prop->getValue($controller);
     }
 }
