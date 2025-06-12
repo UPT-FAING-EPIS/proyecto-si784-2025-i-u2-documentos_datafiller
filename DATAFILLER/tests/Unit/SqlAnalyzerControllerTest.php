@@ -6,6 +6,8 @@ namespace App\Tests\Unit;
 if (!class_exists('\PhpMyAdmin\SqlParser\Components\CreateDefinition')) {
     eval('namespace PhpMyAdmin\SqlParser\Components; class CreateDefinition {}');
 }
+require_once __DIR__ . '/../../controllers/SqlAnalyzerController.php'; // <--- AGREGAR ESTA LÍNEA
+
 
 use PHPUnit\Framework\TestCase;
 use App\Controllers\SqlAnalyzerController;
