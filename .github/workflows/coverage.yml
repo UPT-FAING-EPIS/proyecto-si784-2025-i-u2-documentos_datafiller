@@ -23,6 +23,10 @@ jobs:
       - name: Install dependencies
         working-directory: DATAFILLER
         run: composer install --no-interaction
+        
+      - name: Regenerate Composer autoloader
+        working-directory: DATAFILLER
+        run: composer dump-autoload -o
 
       - name: Ensure phpunit is executable
         working-directory: DATAFILLER
