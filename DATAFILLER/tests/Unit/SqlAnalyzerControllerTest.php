@@ -22,6 +22,8 @@ final class SqlAnalyzerControllerTest extends TestCase
     private int $usuarioId = 42;
     private string $dbType = 'sql';
     private SqlAnalyzerController $controller;
+    private ReflectionClass $ref; // <- Added ReflectionClass property
+
 
     protected function setUp(): void
     {
@@ -60,7 +62,7 @@ final class SqlAnalyzerControllerTest extends TestCase
         $method->setAccessible(true);
         return $method->invokeArgs($this->controller, $args);
     }
-    
+
     public function testLimiteConsultasAgotadoDevuelveError(): void
     {
         // Usuario que ya no tiene consultas restantes
