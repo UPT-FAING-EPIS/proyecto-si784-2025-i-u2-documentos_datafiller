@@ -1,0 +1,31 @@
+{
+  "metadata": [
+    {
+      "src": [
+        {
+          "files": ["**/*.php"],
+          "src": "../DATAFILLER"
+        }
+      ],
+      "dest": "api"
+    }
+  ],
+  "build": {
+    "content": [
+      {
+        "files": ["*.md", "manual/*.md", "api/*.yml"]
+      }
+    ],
+    "resource": [
+      {
+        "files": ["images/**", "videos/**", "traces/**"]
+      }
+    ],
+    "dest": "_site",
+    "template": ["default"],
+    "globalMetadata": {
+      "_appTitle": "DATAFILLER - Documentación Técnica",
+      "_enableSearch": true
+    }
+  }
+}
