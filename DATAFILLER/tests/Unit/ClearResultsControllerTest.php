@@ -22,9 +22,6 @@ final class ClearResultsControllerTest extends TestCase
             $this->markTestSkipped('No se puede probar sesiones porque los headers ya han sido enviados por PHPUnit.');
         }
 
-        if (session_status() !== PHP_SESSION_ACTIVE) {
-            @session_start();
-        }
         $_SESSION['datos_generados'] = ['algo'];
         $_SESSION['estadisticas_generacion'] = ['otro'];
         $_SESSION['estructura_analizada'] = ['mas'];
