@@ -10,7 +10,7 @@ use PDO;
 // Intercepta App\Config\Database para usar el stub si el controlador lo pide
 spl_autoload_register(function (string $class) {
     if ($class === 'App\Config\Database') {
-        require __DIR__ . '/Stubs/DatabaseStub.php';
+        require __DIR__ . '/Stubs/DatabaseNowStub.php';
     }
 }, /* prepend */ true, /* throw */ true);
 
