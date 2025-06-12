@@ -550,6 +550,7 @@ final class UsuarioTest extends TestCase
         $this->assertTrue($usuario->incrementarConsultas(42));
     }
 
+    
     public function testIncrementarConsultasSinRegistros(): void
     {
         // Simula que no existe registro previo: rowCount = 0
