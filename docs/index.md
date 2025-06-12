@@ -1,17 +1,55 @@
-# DATAFILLER - Documentación
+# DATAFILLER - Documentación Técnica
 
-## Mi Proyecto SI784
+## Información del Proyecto
+- **Materia:** SI784 - Sistemas de Información  
+- **Gestión:** 2025-I
+- **Unidad:** U2 - Documentos DataFiller
+- **Tecnología:** PHP 8.0.30
 
-Este es mi sistema DATAFILLER desarrollado en PHP 8.0.30
+## Descripción del Sistema
 
-### Contenido:
-- [Manual de Usuario](manual/user-manual.md)
-- [Documentación Técnica](manual/technical.md)
+DATAFILLER es un sistema web desarrollado en PHP para la gestión integral de documentos.
 
-### Tecnologías:
-- PHP 8.0.30
-- MySQL
-- XAMPP
-- HTML/CSS/JavaScript
+## 📚 Documentación Disponible
 
-![Sistema](images/screenshot.png)
+### Informes del Proyecto
+- [📄 FD01 - Informe de Factibilidad](informes/FD01-EPIS-Informe%20de%20Factibilidad.md)
+
+### Manuales Técnicos
+- [📖 Manual de Usuario](manual/user-manual.md)
+- [🔧 Documentación Técnica](manual/technical.md)
+
+### Enlaces del Sistema
+- **Producción:** https://datafiller3.sytes.net/
+- **Documentación:** https://datafiller2-b2cbeph0h3a3hfgy.eastus-01.azurewebsites.net/docs/
+
+## Arquitectura del Sistema
+
+### Tecnologías Utilizadas
+- **Backend:** PHP 8.0.30
+- **Base de Datos:** MySQL/MariaDB  
+- **Servidor Web:** Apache (XAMPP)
+- **Frontend:** HTML5, CSS3, JavaScript
+- **Documentación:** DocFX
+- **CI/CD:** GitHub Actions
+
+### Estructura del Proyecto
+```
+DATAFILLER/
+├── config/          # Configuración del sistema
+├── controllers/     # Controladores MVC
+├── models/         # Modelos de datos  
+├── views/          # Vistas y templates
+├── public/         # Archivos públicos
+├── tests/          # Pruebas unitarias
+├── docs/           # Documentación técnica
+└── FD01-EPIS-*.md  # Informes del proyecto
+```
+
+## Capturas del Sistema
+
+![Interfaz Principal](images/main-interface.png)
+
+---
+
+*Documentación generada automáticamente con DocFX - Actualizada: {{ site.time }}*

@@ -14,6 +14,11 @@
     "content": [
       {
         "files": ["*.md", "manual/*.md", "api/*.yml"]
+      },
+      {
+        "files": ["../FD*.md"],
+        "src": ".",
+        "dest": "informes"
       }
     ],
     "resource": [
@@ -31,9 +36,12 @@
   "pdf": {
     "content": [
       {
-        "files": ["*.md", "manual/*.md"]
+        "files": ["*.md", "manual/*.md", "../FD*.md"]
       }
     ],
-    "dest": "_pdf"
+    "dest": "_pdf",
+    "wkhtmltopdf": {
+      "additionalArguments": "--enable-local-file-access"
+    }
   }
 }
