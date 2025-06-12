@@ -22,11 +22,6 @@ final class UsuarioTest extends TestCase
         $this->dbMock
             ->method('prepare')
             ->willReturn($this->stmtMock);
-
-        // Por defecto, execute() no falla
-        $this->stmtMock
-            ->method('execute')
-            ->willReturn(true);
     }
 
     public function testCrearDevuelveFalseCuandoYaExisteUsuario(): void
@@ -284,9 +279,8 @@ final class UsuarioTest extends TestCase
 
     public function testActualizarPlan(): void
     {
-        // prepare() + bindParam no fallan; controlamos solo execute()
+        // Simulamos dos ejecuciones: la primera true, la segunda false
         $this->stmtMock
-            ->expects($this->exactly(2))
             ->method('execute')
             ->willReturnOnConsecutiveCalls(true, false);
 
@@ -294,7 +288,6 @@ final class UsuarioTest extends TestCase
         $this->assertTrue($usuario->actualizarPlan(10, 'premium'));
         $this->assertFalse($usuario->actualizarPlan(10, 'gratuito'));
     }
-
     public function testExisteUsuario(): void
     {
         $this->stmtMock
@@ -307,15 +300,16 @@ final class UsuarioTest extends TestCase
         $this->assertFalse($usuario->existeUsuario(12));
     }
 
-    public function testCrudTokensYPassword(): void
+     public function testCrudTokensYPassword(): void
     {
-        // limpiarTokensExpirados + guardarTokenRecuperacion
+        // Hacemos que execute() devuelva true en todas las llamadas
         $this->stmtMock
-            ->expects($this->exactly(2))
             ->method('execute')
             ->willReturn(true);
 
         $usuario = new Usuario($this->dbMock);
+
+        // limpiarTokensExpirados y guardarTokenRecuperacion
         $this->assertTrue($usuario->limpiarTokensExpirados());
         $this->assertTrue($usuario->guardarTokenRecuperacion(13, 'tok', '2025-01-01'));
 
@@ -325,15 +319,10 @@ final class UsuarioTest extends TestCase
             ->willReturn(1);
         $this->stmtMock
             ->method('fetch')
-            ->willReturn(['token'=>'tok','email'=>'e','nombre'=>'n']);
+            ->willReturn(['token' => 'tok', 'email' => 'e', 'nombre' => 'n']);
         $this->assertIsArray($usuario->verificarTokenRecuperacion('tok'));
 
-        // cambiarPassword + marcarTokenUsado
-        $this->stmtMock
-            ->expects($this->exactly(2))
-            ->method('execute')
-            ->willReturn(true);
-
+        // cambiarPassword y marcarTokenUsado
         $this->assertTrue($usuario->cambiarPassword(14, 'newpass'));
         $this->assertTrue($usuario->marcarTokenUsado('tok'));
     }
