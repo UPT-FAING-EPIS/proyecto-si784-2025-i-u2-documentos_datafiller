@@ -24,6 +24,48 @@ final class UsuarioTest extends TestCase
             ->willReturn($this->stmtMock);
     }
 
+    public function testBuscarPorEmail(): void
+    {
+        $row = ['id'=>7,'nombre'=>'alex','apellido_paterno'=>'p','email'=>'a@e'];
+        // primer escenario: encuentra
+        $this->stmtMock->method('rowCount')->willReturnOnConsecutiveCalls(1, 0);
+        $this->stmtMock->method('fetch')->with(PDO::FETCH_ASSOC)->willReturn($row);
+
+        $usuario = new Usuario($this->dbMock);
+        $this->assertSame($row, $usuario->buscarPorEmail('a@e'));
+        // segundo escenario: no encuentra
+        $this->assertFalse($usuario->buscarPorEmail('b@e'));
+    }
+
+    public function testObtenerInfoCompleta(): void
+    {
+        $data = [
+            'id'=>8,'nombre'=>'ana','apellido_paterno'=>'x','email'=>'x@e',
+            'tipo_plan'=>'gratuito','consultas_diarias'=>1,'fecha_ultima_consulta'=>'2025-06-12'
+        ];
+        $this->stmtMock->method('rowCount')->willReturnOnConsecutiveCalls(1, 0);
+        $this->stmtMock->method('fetch')->with(PDO::FETCH_ASSOC)->willReturn($data);
+
+        $usuario = new Usuario($this->dbMock);
+        // existe registro
+        $this->assertSame($data, $usuario->obtenerInfoCompleta(8));
+        // no existe
+        $this->assertFalse($usuario->obtenerInfoCompleta(9));
+    }
+
+    public function testObtenerInfoUsuario(): void
+    {
+        $info = [
+            'id'=>9,'nombre'=>'pepe','apellido_paterno'=>'p','email'=>'p@e',
+            'plan'=>'premium','consultas_diarias'=>5,'fecha_ultima_consulta'=>'2025-06-11'
+        ];
+        $this->stmtMock->method('rowCount')->willReturnOnConsecutiveCalls(1, 0);
+        $this->stmtMock->method('fetch')->with(PDO::FETCH_ASSOC)->willReturn($info);
+
+        $usuario = new Usuario($this->dbMock);
+        $this->assertSame($info, $usuario->obtenerInfoUsuario(9));
+        $this->assertFalse($usuario->obtenerInfoUsuario(10));
+    }
     public function testCrearDevuelveFalseCuandoYaExisteUsuario(): void
     {
         $usuario = $this->getMockBuilder(Usuario::class)
@@ -332,4 +374,75 @@ final class UsuarioTest extends TestCase
         $this->assertTrue($usuario->cambiarPassword(14, 'newpass'));
         $this->assertTrue($usuario->marcarTokenUsado('tok'));
     }
+    public function testObtenerPlanUsuario(): void
+    {
+        // caso encuentra plan
+        $this->stmtMock->method('rowCount')->willReturnOnConsecutiveCalls(1, 0);
+        $this->stmtMock->method('fetch')->with(PDO::FETCH_ASSOC)->willReturn(['tipo_plan'=>'premium']);
+
+        $usuario = new Usuario($this->dbMock);
+        $this->assertSame('premium', $usuario->obtenerPlanUsuario(11));
+        // caso default gratuito
+        $this->assertSame('gratuito', $usuario->obtenerPlanUsuario(12));
+    }
+
+    public function testObtenerEstadisticasUsuario(): void
+    {
+        $stats = [
+            'total_consultas'=>4,
+            'total_registros_generados'=>100,
+            'dias_activos'=>2,
+            'ultima_actividad'=>'2025-06-12'
+        ];
+        // rowCount true y luego false
+        $this->stmtMock->method('rowCount')->willReturnOnConsecutiveCalls(1, 0);
+        $this->stmtMock->method('fetch')->with(PDO::FETCH_ASSOC)->willReturn($stats);
+
+        $usuario = new Usuario($this->dbMock);
+        // hay registros
+        $this->assertSame($stats, $usuario->obtenerEstadisticasUsuario(13));
+        // no hay, retorna estructura por defecto
+        $expected = [
+            'total_consultas'=>0,
+            'total_registros_generados'=>0,
+            'dias_activos'=>0,
+            'ultima_actividad'=>null
+        ];
+        $this->assertSame($expected, $usuario->obtenerEstadisticasUsuario(14));
+    }
+
+    public function testCalcularConsultasRestantes(): void
+    {
+        $today = date('Y-m-d');
+        // premium => 999
+        $spy1 = $this->getMockBuilder(Usuario::class)
+            ->setConstructorArgs([$this->dbMock])
+            ->onlyMethods(['obtenerInfoUsuario'])
+            ->getMock();
+        $spy1->method('obtenerInfoUsuario')->willReturn([
+            'plan'=>'premium','consultas_diarias'=>0,'fecha_ultima_consulta'=>$today
+        ]);
+        $this->assertGreaterThan(100, $spy1->calcularConsultasRestantes(15));
+
+        // mismo día => restan 2
+        $spy2 = $this->getMockBuilder(Usuario::class)
+            ->setConstructorArgs([$this->dbMock])
+            ->onlyMethods(['obtenerInfoUsuario'])
+            ->getMock();
+        $spy2->method('obtenerInfoUsuario')->willReturn([
+            'plan'=>'gratuito','consultas_diarias'=>1,'fecha_ultima_consulta'=>$today
+        ]);
+        $this->assertSame(2, $spy2->calcularConsultasRestantes(16));
+
+        // nuevo día => restan 3
+        $spy3 = $this->getMockBuilder(Usuario::class)
+            ->setConstructorArgs([$this->dbMock])
+            ->onlyMethods(['obtenerInfoUsuario'])
+            ->getMock();
+        $spy3->method('obtenerInfoUsuario')->willReturn([
+            'plan'=>'gratuito','consultas_diarias'=>3,'fecha_ultima_consulta'=>'2000-01-01'
+        ]);
+        $this->assertSame(3, $spy3->calcularConsultasRestantes(17));
+    }
+}
 }
