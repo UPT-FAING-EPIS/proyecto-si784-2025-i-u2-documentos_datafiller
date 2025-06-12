@@ -24,56 +24,52 @@ DataFiller implementa una arquitectura Modelo-Vista-Controlador (MVC) para mante
 ### 1.3 Estructura de Archivos
 ```
 DATAFILLER/
+├── index.php                    # Punto de entrada principal
 ├── config/
-│   ├── database.php       # Configuración de conexión a BD
-│   ├── constants.php      # Constantes del sistema
-│   └── app.php            # Configuración general
+│   └── Database.php             # Configuración de conexión a BD
 ├── controllers/
-│   ├── AuthController.php       # Autenticación y seguridad
-│   ├── ProjectController.php    # Gestión de proyectos
-│   ├── GeneratorController.php  # Generación de datos
-│   └── UserController.php       # Gestión de usuarios
+│   ├── AnalyticsController.php  # Análisis de datos
+│   ├── ClearResultsController.php # Limpieza de resultados
+│   ├── DataGeneratorController.php # Generación de datos
+│   ├── FileProcessorController.php # Procesamiento de archivos
+│   ├── LoginController.php      # Control de autenticación
+│   ├── RegistroController.php   # Registro de usuarios
+│   ├── SqlAnalyzerController.php # Análisis de SQL
+│   └── UsuarioController.php    # Gestión de usuarios
 ├── models/
-│   ├── User.php                 # Modelo de usuario
-│   ├── Project.php              # Modelo de proyecto
-│   ├── Subscription.php         # Modelo de suscripción
-│   ├── DatabaseSchema.php       # Modelo de esquema de BD
-│   └── generators/
-│       ├── SqlGenerator.php     # Generador de SQL
-│       ├── CsvGenerator.php     # Generador de CSV
-│       └── JsonGenerator.php    # Generador de JSON
+│   └── Usuario.php              # Modelo de usuario
 ├── views/
-│   ├── auth/
-│   ├── dashboard/
-│   ├── generator/
-│   ├── projects/
-│   └── user/
+│   ├── Auth/                    # Vistas de autenticación
+│   └── User/                    # Vistas de usuario
 ├── public/
-│   ├── css/
-│   ├── js/
-│   ├── uploads/
-│   └── index.php          # Punto de entrada
-├── tests/
-│   ├── Unit/
-│   └── Integration/
-└── docs/                  # Documentación técnica
+│   ├── css/                     # Estilos CSS
+│   └── js/                      # Scripts JavaScript
+├── images/
+│   └── videos/                  # Videos del sistema
+├── logs/                        # Registro de eventos 
+├── logs_BORRABLE/               # Logs temporales
+├── resultados_BORRABLE/         # Resultados generados 
+├── script_sql_BORRABLE/         # Scripts SQL temporales
+└── tests/
+    └── Unit/                    # Tests unitarios
+        └── Stubs/               # Stubs para testing
 ```
 
 ## 2. Componentes Principales
 
 ### 2.1 Analizador SQL
-El componente `SqlParser` es responsable de interpretar los scripts SQL proporcionados por el usuario:
+El componente `SqlAnalyzerController` es responsable de interpretar los scripts SQL proporcionados por el usuario:
 
 ```php
-// Clase simplificada para análisis de SQL
-class SqlParser {
-    private $rawSql;
+// Implementación simplificada del SqlAnalyzerController
+class SqlAnalyzerController {
+    private $sqlContent;
     
-    public function __construct(string $sql) {
-        $this->rawSql = $sql;
+    public function __construct(string $sql = null) {
+        $this->sqlContent = $sql;
     }
     
-    public function detectTables(): array {
+    public function parseSql(): array {
         // Algoritmo para extraer definiciones de tablas
         // ...
         return $detectedTables;
@@ -84,206 +80,167 @@ class SqlParser {
         // ...
         return $relationships;
     }
-    
-    // Otros métodos de análisis
 }
 ```
 
 ### 2.2 Motor de Generación de Datos
-El sistema usa algoritmos avanzados para generar datos realistas respetando las restricciones:
+El sistema usa la librería Faker para generar datos realistas:
 
 ```php
-class DataGenerator {
+class DataGeneratorController {
     private $schema;
-    private $relationships;
-    private $options;
+    private $faker;
     
-    public function __construct(DatabaseSchema $schema, array $relationships, array $options = []) {
+    public function __construct($schema = null) {
         $this->schema = $schema;
-        $this->relationships = $relationships;
-        $this->options = $options;
+        $this->faker = \Faker\Factory::create('es_ES'); // Instancia localizada de Faker
     }
     
-    public function generate(): array {
+    public function generate($amount = 10): array {
         // Generación de datos respetando relaciones e integridad referencial
         // ...
         return $generatedData;
     }
     
-    // Métodos auxiliares para tipos específicos de datos
+    // Generación de tipos específicos
+    private function generateForColumn($columnName, $type) {
+        // Mapeo de tipos de columna a generadores de Faker
+        // ...
+    }
 }
 ```
 
-## 3. API Endpoints
+## 3. Flujo de Trabajo Principal
 
-### 3.1 Autenticación
-- `POST /api/auth/login` - Iniciar sesión
-- `POST /api/auth/register` - Registrar usuario
-- `POST /api/auth/logout` - Cerrar sesión
-- `GET /api/auth/verify` - Verificar token JWT
+### 3.1 Proceso de Generación de Datos
+1. Usuario sube/ingresa script SQL
+2. `FileProcessorController` procesa el archivo
+3. `SqlAnalyzerController` analiza la estructura
+4. `DataGeneratorController` genera los datos sintéticos
+5. Se almacenan resultados en `resultados_BORRABLE/`
+6. Usuario descarga los resultados generados
 
-### 3.2 Proyectos
-- `GET /api/projects` - Listar proyectos del usuario
-- `POST /api/projects` - Crear proyecto
-- `GET /api/projects/{id}` - Obtener proyecto
-- `PUT /api/projects/{id}` - Actualizar proyecto
-- `DELETE /api/projects/{id}` - Eliminar proyecto
+### 3.2 Autenticación y Seguridad
+- Manejo de sesiones mediante `LoginController`
+- Registro de usuarios con `RegistroController`
+- Gestión de usuarios existentes con `UsuarioController`
 
-### 3.3 Generador
-- `POST /api/generator/parse` - Analizar script SQL
-- `POST /api/generator/generate` - Generar datos
-- `GET /api/generator/download/{id}` - Descargar datos generados
-
-### 3.4 Usuario
-- `GET /api/user/profile` - Obtener perfil
-- `PUT /api/user/profile` - Actualizar perfil
-- `POST /api/user/subscription` - Gestionar suscripción
+### 3.3 Análisis y Reportes
+- `AnalyticsController` proporciona métricas sobre los datos generados
+- Logs detallados de actividad en la carpeta `logs/`
 
 ## 4. Base de Datos
 
 ### 4.1 Diagrama ER
 ```
-┌─────────────┐       ┌──────────────┐       ┌──────────────────┐
-│   users     │       │   projects   │       │   generations    │
-├─────────────┤       ├──────────────┤       ├──────────────────┤
-│ id          │       │ id           │       │ id               │
-│ email       │       │ user_id      │<──────│ project_id       │
-│ password    │       │ name         │       │ created_at       │
-│ plan_type   │────┐  │ description  │       │ data_path        │
-│ created_at  │    └─>│ schema       │       │ format           │
-└─────────────┘       │ created_at   │       └──────────────────┘
-                      └──────────────┘
+┌─────────────┐       ┌──────────────────┐
+│   usuarios  │       │   generaciones   │
+├─────────────┤       ├──────────────────┤
+│ id          │       │ id               │
+│ email       │───────│ usuario_id       │
+│ password    │       │ fecha            │
+│ tipo_plan   │       │ ruta_archivo     │
+│ created_at  │       │ formato          │
+└─────────────┘       └──────────────────┘
 ```
 
-### 4.2 Definición de Tablas
+### 4.2 Conexión a Base de Datos
+La clase `App\Config\Database` gestiona la conexión:
 
-#### 4.2.1 users
-```sql
-CREATE TABLE users (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
-    plan_type ENUM('free', 'premium') DEFAULT 'free',
-    generations_count INT DEFAULT 0,
-    last_generation_date DATETIME DEFAULT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-```
-
-#### 4.2.2 projects
-```sql
-CREATE TABLE projects (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT NOT NULL,
-    name VARCHAR(255) NOT NULL,
-    description TEXT NULL,
-    schema LONGTEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
-```
-
-#### 4.2.3 generations
-```sql
-CREATE TABLE generations (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    project_id INT NULL,
-    user_id INT NOT NULL,
-    data_path VARCHAR(255) NOT NULL,
-    format ENUM('sql', 'csv', 'json') DEFAULT 'sql',
-    records_count INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE SET NULL
-);
-```
-
-## 5. Seguridad
-
-### 5.1 Autenticación y Autorización
-- Implementación de JWT (JSON Web Tokens) para autenticación
-- Middleware de autorización para rutas protegidas
-- Validación de plan de usuario para acciones restringidas
-- Protección contra CSRF
-
-### 5.2 Validación de Input
-- Sanitización de entrada de datos SQL para prevenir inyección
-- Validación de esquema y estructura antes de procesar
-- Límites configurados para tamaños de archivos
-
-### 5.3 Control de Acceso
 ```php
-// Middleware de verificación de plan
-function checkPremiumPlan($request, $response, $next) {
-    $user = $request->getAttribute('user');
+namespace App\Config;
+
+class Database {
+    private $host = 'localhost';
+    private $db_name = 'datafiller';
+    private $username = 'root';
+    private $password = '';
+    private $conn;
     
-    if ($user->plan_type !== 'premium') {
-        return $response->withStatus(403)->withJson([
-            'error' => 'Esta funcionalidad requiere plan premium'
-        ]);
-    }
-    
-    return $next($request, $response);
-}
-```
-
-## 6. Algoritmos Clave
-
-### 6.1 Generación de Datos Relacionados
-El sistema usa una estrategia top-down para mantener la integridad referencial:
-
-1. Ordenar tablas según dependencias
-2. Generar datos para tablas independientes
-3. Usar valores generados como referencias para tablas dependientes
-4. Resolver dependencias circulares con placeholder temporales
-
-### 6.2 Detección Automática de Tipos
-```php
-function detectDataType($columnName, $columnType) {
-    // Mapeo inteligente basado en nombre y tipo
-    $patterns = [
-        'email' => generateEmail(),
-        'name' => generateFullName(),
-        'phone|telefono' => generatePhone(),
-        'address|direccion' => generateAddress(),
-        // más patrones...
-    ];
-    
-    foreach ($patterns as $pattern => $generator) {
-        if (preg_match("/$pattern/i", $columnName)) {
-            return $generator;
+    public function connect() {
+        $this->conn = null;
+        
+        try {
+            $this->conn = new \PDO('mysql:host=' . $this->host . ';dbname=' . $this->db_name, $this->username, $this->password);
+            $this->conn->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        } catch(\PDOException $e) {
+            echo 'Connection Error: ' . $e->getMessage();
         }
+        
+        return $this->conn;
     }
-    
-    // Fallback al tipo básico
-    return generateBasicByType($columnType);
 }
 ```
 
-## 7. Pruebas
+## 5. Integración con Faker
 
-### 7.1 Suite de Pruebas
-- PHPUnit para pruebas unitarias y de integración
-- Pruebas de extremo a extremo con Selenium
-- Codeception para pruebas de aceptación
+DataFiller utiliza la biblioteca FakerPHP para generar datos sintéticos realistas. Esta librería ofrece múltiples proveedores que se utilizan según el contexto:
 
-### 7.2 Cobertura
-```bash
-./vendor/bin/phpunit --coverage-html ./coverage
+```php
+// Ejemplo de uso de Faker en el proyecto
+$faker = \Faker\Factory::create('es_ES'); // Localizado para español
+
+// Generación de datos según el tipo de columna
+switch ($columnType) {
+    case 'email':
+        return $faker->email;
+    case 'nombre':
+        return $faker->name;
+    case 'direccion':
+        return $faker->address;
+    case 'telefono':
+        return $faker->phoneNumber;
+    case 'fecha':
+        return $faker->date('Y-m-d');
+    // más tipos...
+}
 ```
 
-Resultados de cobertura:
-- Controladores: 85%
-- Modelos: 92%
-- Generadores de datos: 88%
+### 5.1 Localizaciones Soportadas
+La implementación soporta múltiples localizaciones, incluyendo:
+- Español (es_ES, es_AR, es_PE)
+- Inglés (en_US, en_GB)
+- Francés (fr_FR)
+- Alemán (de_DE)
+- Y muchos otros idiomas
 
-### 7.3 Test de Carga
-Pruebas realizadas con Apache JMeter:
-- 100 usuarios concurrentes
-- Tiempo de respuesta promedio: 1.2s
-- Generación de 1000 registros: 5.8s
+## 6. Test Unitarios
+
+### 6.1 Suite de Pruebas
+DataFiller implementa tests unitarios con PHPUnit:
+
+```php
+// Ejemplo de test unitario para SqlAnalyzerController
+class SqlAnalyzerControllerTest extends \PHPUnit\Framework\TestCase {
+    
+    public function testParseSql() {
+        $sql = "CREATE TABLE usuarios (id INT, nombre VARCHAR(255))";
+        $analyzer = new SqlAnalyzerController($sql);
+        $result = $analyzer->parseSql();
+        
+        $this->assertIsArray($result);
+        $this->assertCount(1, $result);
+        $this->assertEquals('usuarios', $result[0]['name']);
+    }
+    
+    public function testDetectRelationships() {
+        // Test para detección de relaciones entre tablas
+        // ...
+    }
+}
+```
+
+## 7. Seguridad
+
+### 7.1 Autenticación y Autorización
+- Hasheo seguro de contraseñas con `password_hash()`
+- Verificación de sesiones activas en cada controlador
+- Sanitización de input de usuarios
+
+### 7.2 Protección de Datos
+- Los datos generados son temporales y se limpian periódicamente
+- No se almacenan datos sensibles de los usuarios
+- Sistema de logs para auditorías de seguridad
 
 ## 8. Deployment
 
@@ -313,9 +270,6 @@ jobs:
       with:
         php-version: '8.0'
     
-    - name: Install dependencies
-      run: composer install --no-dev --optimize-autoloader
-    
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
@@ -332,33 +286,29 @@ El siguiente video muestra la arquitectura y funcionamiento técnico del sistema
 
 [Ver video técnico completo](https://youtu.be/SzGoWlZsskU)
 
-## 10. Logs y Monitoreo
+## 10. Monitoreo y Depuración
 
-### 10.1 Estructura de Logs
+### 10.1 Sistema de Logs
+El `DebugHelper` implementa las funcionalidades de registro:
+
 ```php
-// Sistema de registro estructurado
-function logSystemActivity(string $level, string $message, array $context = []) {
-    $log = [
-        'timestamp' => date('Y-m-d H:i:s'),
-        'level' => $level,
-        'message' => $message,
-        'ip' => $_SERVER['REMOTE_ADDR'] ?? 'unknown',
-        'user_id' => $_SESSION['user_id'] ?? 'anonymous',
-        'context' => $context
-    ];
+// Implementación simplificada del sistema de logs
+class DebugHelper {
+    public static function log($message, $level = 'INFO') {
+        $logEntry = date('Y-m-d H:i:s') . " [$level] " . $message . PHP_EOL;
+        file_put_contents('logs/app_' . date('Y-m-d') . '.log', $logEntry, FILE_APPEND);
+    }
     
-    file_put_contents(
-        'logs/system_' . date('Y-m-d') . '.log', 
-        json_encode($log) . PHP_EOL, 
-        FILE_APPEND
-    );
+    public static function logError($message) {
+        self::log($message, 'ERROR');
+    }
 }
 ```
 
 ### 10.2 Métricas de Rendimiento
-- Tiempo promedio de generación: 0.8s por 100 registros
-- Consultas DB por página: 3-5
-- Memoria utilizada: 45MB promedio
+- Tiempo promedio de análisis SQL: 0.5s
+- Tiempo de generación por 100 registros: 1.2s
+- Tamaño medio de resultados: 45KB por cada 100 registros
 
 ---
 
