@@ -87,6 +87,29 @@ final class UsuarioTest extends TestCase
         $this->assertFalse($usuario->crear());
     }
 
+     public function testCrearDevuelveFalseCuandoInsercionFalla(): void
+    {
+        $usuario = $this->getMockBuilder(Usuario::class)
+            ->setConstructorArgs([$this->dbMock])
+            ->onlyMethods(['buscarPorNombre'])
+            ->getMock();
+
+        // Prevenir existencia previa
+        $usuario->method('buscarPorNombre')->willReturn(false);
+        // Datos de usuario
+        $usuario->nombre = 'maria';
+        $usuario->apellido_paterno = 'p';
+        $usuario->apellido_materno = 'm';
+        $usuario->email = 'm@e';
+        $usuario->password = 'pwd';
+
+        // bindParam ok, pero execute falla
+        $this->stmtMock->method('bindParam')->willReturn(true);
+        $this->stmtMock->method('execute')->willReturn(false);
+
+        // Ejecutar y esperar false en fallback
+        $this->assertFalse($usuario->crear());
+   }
     public function testCrearInsertaYDevuelveTrueCuandoNoExiste(): void
     {
         $usuario = $this->getMockBuilder(Usuario::class)
