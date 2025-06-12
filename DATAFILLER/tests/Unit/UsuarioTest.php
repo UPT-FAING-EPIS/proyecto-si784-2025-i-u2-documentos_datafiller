@@ -37,6 +37,18 @@ final class UsuarioTest extends TestCase
         $this->assertFalse($usuario->buscarPorEmail('b@e'));
     }
 
+    public function testBuscarPorEmailException(): void
+    {
+        // PDO stub that throws on prepare() to hit the catch block
+        $dbException = $this->createMock(\PDO::class);
+        $dbException
+            ->method('prepare')
+            ->willThrowException(new \PDOException('DB fallo'));
+
+        $usuario = new Usuario($dbException);
+       // When prepare() fails, buscarPorEmail must catch and return false
+        $this->assertFalse($usuario->buscarPorEmail('foo@bar'));
+    }
     public function testObtenerInfoCompleta(): void
     {
         $data = [
@@ -103,7 +115,7 @@ final class UsuarioTest extends TestCase
         $usuario->email = 'm@e';
         $usuario->password = 'pwd';
 
-        
+
         // bindParam ok, pero execute falla
         $this->stmtMock->method('bindParam')->willReturn(true);
         $this->stmtMock->method('execute')->willReturn(false);
@@ -170,6 +182,18 @@ final class UsuarioTest extends TestCase
         $this->assertFalse($result2);
     }
 
+    public function testBuscarPorNombreException(): void
+    {
+        // Simula un error en prepare() para cubrir el catch
+        $dbException = $this->createMock(\PDO::class);
+        $dbException
+            ->method('prepare')
+            ->willThrowException(new \PDOException('DB fallo'));
+
+        $usuario = new Usuario($dbException);
+        // Al lanzar la excepción, debe devolver false en el catch
+        $this->assertFalse($usuario->buscarPorNombre('cualquiera'));
+    }
     public function testValidarLoginExitoYFallo(): void
     {
         $hash = password_hash('secret', PASSWORD_DEFAULT);
