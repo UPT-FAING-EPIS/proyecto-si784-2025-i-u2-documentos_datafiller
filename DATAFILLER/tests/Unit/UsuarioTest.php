@@ -505,7 +505,21 @@ final class UsuarioTest extends TestCase
         $this->assertFalse($usuario->puedeRealizarConsulta(999));
     }
 
-   
+   public function testValidarLoginException(): void
+    {
+        // Simular que buscarPorNombre lance una PDOException
+        $dbException = $this->createMock(\PDO::class);
+        // cualquier prepare() fallará
+        $dbException
+            ->method('prepare')
+            ->willThrowException(new \PDOException('simulated error'));
+
+        $usuario = new Usuario($dbException);
+        // validarLogin atrapa la excepción y debe devolver ['exito' => false]
+        $result = $usuario->validarLogin('user', 'pass');
+        $this->assertArrayHasKey('exito', $result);
+        $this->assertFalse($result['exito']);
+    }
 
     public function testValidarLoginUsuarioNoExiste(): void
     {
@@ -550,7 +564,7 @@ final class UsuarioTest extends TestCase
         $this->assertTrue($usuario->incrementarConsultas(42));
     }
 
-    
+
     public function testIncrementarConsultasSinRegistros(): void
     {
         // Simula que no existe registro previo: rowCount = 0
