@@ -2,39 +2,43 @@ name: Coverage Report
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   pull_request:
+    branches: [ main ]
 
 jobs:
   coverage:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        # Todas las órdenes se ejecutan desde DATAFILLER
-        working-directory: DATAFILLER
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup PHP & extensions
+      - name: Setup PHP & Xdebug
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.1'
+          php-version: '8.2'
           coverage: xdebug
 
       - name: Install dependencies
+        working-directory: DATAFILLER
         run: composer install --no-interaction
 
-      - name: Run PHPUnit (with coverage)
-        run: vendor/bin/phpunit
+      - name: Run PHPUnit & Generate HTML Coverage
+        working-directory: DATAFILLER
+        run: |
+          vendor/bin/phpunit -c phpunit.xml --coverage-html coverage-report
 
-      - name: Publish to GitHub Pages
+      - name: Upload coverage-report as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: DATAFILLER/coverage-report
+
+      - name: Publish coverage to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          # Publicar el HTML generado por PHPUnit en DATAFILLER/coverage-report
           publish_dir: DATAFILLER/coverage-report
           publish_branch: gh-pages
           user_name: github-actions
