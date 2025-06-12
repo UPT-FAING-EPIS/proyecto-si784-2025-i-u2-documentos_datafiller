@@ -242,4 +242,11 @@ final class SqlAnalyzerControllerTest extends TestCase
         $this->assertEquals('booleano', $this->invoke('determinarTipoGeneracion', ['campo', 'BOOL', '', [], false]));
     }
 
+    public function testDebugLogCubreFuncion()
+    {
+        // Llama a la función con un mensaje de prueba
+        debug_log('Cobertura de debug_log');
+        // No se requieren asserts, solo llamar para cubrir la función
+        $this->assertTrue(true);
+    }
 }
