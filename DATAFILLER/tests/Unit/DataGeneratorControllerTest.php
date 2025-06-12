@@ -4,6 +4,7 @@ namespace App\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 use App\Controllers\DataGeneratorController;
+use App\Models\Usuario;
 
 final class DataGeneratorControllerTest extends TestCase
 {
@@ -43,10 +44,9 @@ final class DataGeneratorControllerTest extends TestCase
         ];
 
         $_SESSION['usuario'] = ['id' => 1];
-        $controller = new DataGeneratorController('es_ES');
-
-        // Mock de Usuario para este test
-        $usuarioMock = $this->getMockBuilder(\App\Models\Usuario::class)
+        
+        // Mock de Usuario
+        $usuarioMock = $this->getMockBuilder(Usuario::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['obtenerInfoUsuario'])
             ->getMock();
@@ -55,11 +55,8 @@ final class DataGeneratorControllerTest extends TestCase
             'plan' => 'premium'
         ]);
 
-        // Inyectamos el mock en el controlador
-        $refCtrl = new \ReflectionClass($controller);
-        $propUsuario = $refCtrl->getProperty('usuario');
-        $propUsuario->setAccessible(true);
-        $propUsuario->setValue($controller, $usuarioMock);
+        // Crea una instancia del controlador pasando el mock como dependencia
+        $controller = new DataGeneratorController('es_ES', $usuarioMock);
 
         $result = $controller->generarDatos($config, 1);
 
