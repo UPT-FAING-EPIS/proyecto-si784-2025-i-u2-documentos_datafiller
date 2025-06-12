@@ -12,7 +12,6 @@ class PdoNowStub extends PDO
 
     public function prepare($statement, $options = null)
     {
-        // Reemplaza NOW() por CURRENT_TIMESTAMP para compatibilidad con SQLite
         $statement = str_replace('NOW()', 'CURRENT_TIMESTAMP', $statement);
         return parent::prepare($statement, $options ?? []);
     }
