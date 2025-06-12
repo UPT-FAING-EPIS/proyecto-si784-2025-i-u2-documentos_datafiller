@@ -7,7 +7,7 @@
 function enviarEmailRecuperacion(email, nombre, token) {
     const templateParams = {
         email: email,  // Para {{email}} en el template
-        link: `http://localhost/DATAFILLER/views/Auth/nueva_password.php?token=${token}` // Para {{link}} en el template
+        link: `https://datafiller3.sytes.net/views/Auth/nueva_password.php?token=${token}` // Para {{link}} en el template
     };
     
     // CORREGIDO: Usar los IDs reales que me mostraste
