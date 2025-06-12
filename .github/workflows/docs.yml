@@ -2,18 +2,23 @@ name: Generate Documentation
 
 on:
   push:
+    branches: [ main ]
     paths:
       - 'docs/**/*.md'
       - 'docs/docfx.json'
+      - 'DATAFILLER/**/*.php'
   pull_request:
+    branches: [ main ]
     paths:
       - 'docs/**/*.md'
 
 jobs:
   build-docs:
     runs-on: windows-latest
+
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v4
     
     - name: Setup DocFX
       run: |
@@ -23,10 +28,11 @@ jobs:
     - name: Build Documentation
       run: |
         cd docs
-        ../docfx/docfx.exe docfx.json
+        ..\docfx\docfx.exe docfx.json
         
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
+    - name: Upload documentation artifact
+      uses: actions/upload-artifact@v4
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./docs/_site
+        name: datafiller-documentation-${{ github.run_number }}
+        path: docs/_site
+        retention-days: 30
