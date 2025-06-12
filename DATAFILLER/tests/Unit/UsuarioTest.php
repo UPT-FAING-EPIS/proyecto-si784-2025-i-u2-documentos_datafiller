@@ -514,6 +514,7 @@ final class UsuarioTest extends TestCase
             ->method('prepare')
             ->willThrowException(new \PDOException('simulated error'));
 
+            
         $usuario = new Usuario($dbException);
         // validarLogin atrapa la excepción y debe devolver ['exito' => false]
         $result = $usuario->validarLogin('user', 'pass');
