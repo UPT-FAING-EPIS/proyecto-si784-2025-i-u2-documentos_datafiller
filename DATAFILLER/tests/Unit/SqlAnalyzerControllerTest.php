@@ -121,4 +121,5 @@ final class SqlAnalyzerControllerTest extends TestCase
         $this->assertCount(1, $result['tablas']);
         $this->assertSame('users', $result['tablas'][0]['nombre']);
     }
+    
 }
