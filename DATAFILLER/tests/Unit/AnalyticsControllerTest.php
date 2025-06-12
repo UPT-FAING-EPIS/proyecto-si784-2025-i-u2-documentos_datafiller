@@ -43,15 +43,15 @@ final class AnalyticsControllerTest extends TestCase
         // Crea la tabla simulada en memoria
         $pdo = $this->getPrivatePdo($controller);
         $pdo->exec("
-            CREATE TABLE tbauditoria_consultas (
-                usuario_id INTEGER,
-                tipo_consulta TEXT,
-                cantidad_registros INTEGER,
-                formato_exportacion TEXT,
-                fecha_consulta TEXT,
-                ip_usuario TEXT
-            )
-        ");
+    CREATE TABLE tbauditoria_consultas (
+        usuario_id INTEGER,
+        tipo_consulta TEXT,
+        cantidad_registros INTEGER,
+        formato_exportacion TEXT,
+        fecha_consulta TEXT DEFAULT (CURRENT_TIMESTAMP),
+        ip_usuario TEXT
+    )
+");
 
         $result = $controller->registrarDescarga('xlsx', 5);
 
