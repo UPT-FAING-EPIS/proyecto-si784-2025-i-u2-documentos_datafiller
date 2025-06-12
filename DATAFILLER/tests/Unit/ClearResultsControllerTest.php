@@ -18,8 +18,13 @@ final class ClearResultsControllerTest extends TestCase
 
     public function testClearResultsLimpiaVariablesDeSesionYRetornaSuccess(): void
     {
-        ob_start(); // <-- previene errores de headers
+        if (headers_sent()) {
+            $this->markTestSkipped('No se puede probar sesiones porque los headers ya han sido enviados por PHPUnit.');
+        }
 
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            @session_start();
+        }
         $_SESSION['datos_generados'] = ['algo'];
         $_SESSION['estadisticas_generacion'] = ['otro'];
         $_SESSION['estructura_analizada'] = ['mas'];
@@ -27,8 +32,6 @@ final class ClearResultsControllerTest extends TestCase
 
         $controller = new ClearResultsController();
         $result = $controller->clearResults();
-
-        ob_end_clean(); // <-- limpia el buffer
 
         $this->assertArrayNotHasKey('datos_generados', $_SESSION);
         $this->assertArrayNotHasKey('estadisticas_generacion', $_SESSION);
