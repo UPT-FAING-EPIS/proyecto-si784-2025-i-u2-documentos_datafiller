@@ -6,8 +6,6 @@ on:
     paths:
       - 'docs/**/*.md'
       - 'docs/docfx.json'
-      - 'FD*.md'
-      - 'DATAFILLER/**/*.php'
 
 jobs:
   build-docs:
@@ -22,23 +20,16 @@ jobs:
         Invoke-WebRequest -Uri "https://github.com/dotnet/docfx/releases/download/v2.78.3/docfx-win-x64-v2.78.3.zip" -OutFile "docfx.zip"
         Expand-Archive -Path "docfx.zip" -DestinationPath "docfx"
         
-    - name: Build Documentation (HTML)
+    - name: Build Documentation
       run: |
         cd docs
         ..\docfx\docfx.exe docfx.json
-        
-    - name: Build Documentation (PDF)
-      run: |
-        cd docs
-        ..\docfx\docfx.exe pdf docfx.json
-      continue-on-error: true
         
     - name: Create docs folder structure
       run: |
         mkdir deploy
         mkdir deploy\docs
         xcopy docs\_site deploy\docs /E /I
-        if exist docs\_pdf xcopy docs\_pdf deploy\docs\pdf /E /I
         xcopy DATAFILLER deploy /E /I
         
     - name: Deploy to Azure Web App
@@ -48,11 +39,9 @@ jobs:
         publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
         package: ./deploy
         
-    - name: Upload artifact with PDF
+    - name: Upload artifact (backup)
       uses: actions/upload-artifact@v4
       with:
         name: datafiller-documentation-${{ github.run_number }}
-        path: |
-          docs/_site
-          docs/_pdf
+        path: docs/_site
         retention-days: 30
