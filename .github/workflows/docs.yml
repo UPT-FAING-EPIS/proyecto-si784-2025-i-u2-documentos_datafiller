@@ -6,11 +6,6 @@ on:
     paths:
       - 'docs/**/*.md'
       - 'docs/docfx.json'
-      - 'DATAFILLER/**/*.php'
-  pull_request:
-    branches: [ main ]
-    paths:
-      - 'docs/**/*.md'
 
 jobs:
   build-docs:
@@ -30,7 +25,21 @@ jobs:
         cd docs
         ..\docfx\docfx.exe docfx.json
         
-    - name: Upload documentation artifact
+    - name: Create docs folder structure
+      run: |
+        mkdir deploy
+        mkdir deploy\docs
+        xcopy docs\_site deploy\docs /E /I
+        xcopy DATAFILLER deploy /E /I
+        
+    - name: Deploy to Azure Web App
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'datafiller2'
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        package: ./deploy
+        
+    - name: Upload artifact (backup)
       uses: actions/upload-artifact@v4
       with:
         name: datafiller-documentation-${{ github.run_number }}

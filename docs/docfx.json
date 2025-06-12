@@ -27,5 +27,13 @@
       "_appTitle": "DATAFILLER - Documentación Técnica",
       "_enableSearch": true
     }
+  },
+  "pdf": {
+    "content": [
+      {
+        "files": ["*.md", "manual/*.md"]
+      }
+    ],
+    "dest": "_pdf"
   }
 }
