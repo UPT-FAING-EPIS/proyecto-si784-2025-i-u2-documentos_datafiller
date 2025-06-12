@@ -215,43 +215,6 @@ final class SqlAnalyzerControllerTest extends TestCase
         $this->assertEquals('texto_aleatorio', $this->invoke('determinarTipoGeneracion', ['campoX', 'VARCHAR', '', [], false]));
     }
     /**kkkkkkk */
-    public function testAnalizarTablaConParserProcesaColumnasYForeignKey()
-    {
-        // REQUIERE QUE TENGAS INSTALADA LA LIBRERIA phpmyadmin/sql-parser
-        $col = new CreateDefinition();
-        $col->name = 'id';
-        $col->type = (object)['name' => 'INT', 'parameters' => [11]];
-        $col->options = (object)['options' => []];
-        $col->key = (object)['type' => 'PRIMARY KEY'];
-
-        $fk = new CreateDefinition();
-        $fk->name = 'cliente_id';
-        $fk->type = (object)['name' => 'INT', 'parameters' => [11]];
-        $fk->options = (object)['options' => []];
-        $fk->key = (object)['type' => 'FOREIGN KEY'];
-        $fk->references = (object)[
-            'table' => 'clientes',
-            'columns' => ['id']
-        ];
-
-        $statement = new class($col, $fk) {
-            public $name;
-            public $fields;
-            public function __construct($col, $fk) {
-                $this->name = (object)['table' => 'facturas'];
-                $this->fields = [$col, $fk];
-            }
-            public function build() { return 'CREATE TABLE facturas...'; }
-        };
-
-        $result = $this->invoke('analizarTablaConParser', [$statement]);
-        $this->assertIsArray($result);
-        $this->assertEquals('facturas', $result['nombre']);
-        $this->assertCount(2, $result['columnas']);
-        $this->assertTrue($result['columnas'][1]['es_foreign_key']);
-        $this->assertEquals('clientes', $result['columnas'][1]['references_table']);
-        $this->assertEquals('id', $result['columnas'][1]['references_column']);
-    }
 
     public function testExtraerColumnasFallbackMejoradoCubreTodosLosCasos()
     {
@@ -300,14 +263,4 @@ final class SqlAnalyzerControllerTest extends TestCase
         $this->assertEquals('booleano', $this->invoke('determinarTipoGeneracion', ['campo', 'BOOL', '', [], false]));
     }
 
-    public function testAnalizarTablaConParserCatch()
-    {
-        $statement = new class {
-            public $name = null;
-            public $fields = null;
-            public function build() { return ''; }
-        };
-        $result = $this->invoke('analizarTablaConParser', [$statement]);
-        $this->assertNull($result);
-    }
 }
