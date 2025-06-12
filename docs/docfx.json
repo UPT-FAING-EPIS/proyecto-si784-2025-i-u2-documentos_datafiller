@@ -13,7 +13,7 @@
   "build": {
     "content": [
       {
-        "files": ["*.md", "manual/*.md", "api/*.yml"]
+        "files": ["*.md", "manual/*.md", "informes/*.md", "api/*.yml"]
       }
     ],
     "resource": [
