@@ -52,15 +52,21 @@ final class UsuarioTest extends TestCase
             ->onlyMethods(['buscarPorNombre'])
             ->getMock();
 
+        // Datos de entrada
         $usuario->nombre = 'ana';
         $usuario->apellido_paterno = 'x';
         $usuario->apellido_materno = 'y';
         $usuario->email = 'a@e';
         $usuario->password = 'pw';
 
+        // No existe usuario previo
         $usuario->method('buscarPorNombre')->willReturn(false);
 
-        // Simular el lastInsertId() como string
+        // Stub de bindParam y execute para simular inserción
+        $this->stmtMock->method('bindParam')->willReturn(true);
+        $this->stmtMock->method('execute')->willReturn(true);
+
+        // Simular lastInsertId como string
         $this->dbMock->method('lastInsertId')->willReturn('123');
 
         $this->assertTrue($usuario->crear());
