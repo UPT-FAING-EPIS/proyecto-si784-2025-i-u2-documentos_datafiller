@@ -14,7 +14,6 @@ use App\Models\Usuario;
 use ReflectionClass;
 use PDO;
 use PDOStatement;
-use PhpMyAdmin\SqlParser\Components\CreateDefinition;
 
 // Intercept App\Config\Database para cargar el stub en lugar de la clase real
 spl_autoload_register(function (string $class) {
