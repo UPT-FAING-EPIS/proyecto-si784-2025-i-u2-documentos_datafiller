@@ -13,7 +13,7 @@ jobs:
       run:
         working-directory: infra
     env:
-      INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}  # <-- ✅ API Key disponible en todos los pasos
+      INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}
 
     steps:
       - name: Checkout repo
@@ -45,17 +45,20 @@ jobs:
           ARM_SUBSCRIPTION_ID: ${{ fromJSON(secrets.AZURE_CREDENTIALS).subscriptionId }}
           ARM_TENANT_ID: ${{ fromJSON(secrets.AZURE_CREDENTIALS).tenantId }}
 
+      - name: Show tfplan JSON (debug)
+        run: terraform show -json tfplan > tfplan.json
+
       - name: Install Infracost CLI
         run: |
           curl -s https://raw.githubusercontent.com/infracost/infracost/master/scripts/install.sh | sh
           echo "$HOME/.infracost/bin" >> $GITHUB_PATH
 
-      - name: Generate cost estimate
+      - name: Generate cost estimate from tfplan
         run: |
-          infracost breakdown --path . \
-            --terraform-plan-flags="-out=tfplan" \
-            --format table \
-            --out-file infracost-report.md
+          infracost breakdown \
+            --path=tfplan.json \
+            --format=table \
+            --out-file=infracost-report.md
 
       - name: Mostrar reporte en resumen
         run: |
