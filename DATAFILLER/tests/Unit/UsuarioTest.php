@@ -505,19 +505,21 @@ final class UsuarioTest extends TestCase
         $this->assertFalse($usuario->puedeRealizarConsulta(999));
     }
 
-   public function testValidarLoginException(): void
+   public function testValidarLoginCatchBlock(): void
     {
-        // Simular que buscarPorNombre lance una PDOException
-        $dbException = $this->createMock(\PDO::class);
-        // cualquier prepare() fallará
-        $dbException
-            ->method('prepare')
-            ->willThrowException(new \PDOException('simulated error'));
+        // Crear un stub de Usuario donde buscarPorNombre lanza PDOException
+        $usuario = $this->getMockBuilder(\App\Models\Usuario::class)
+            ->setConstructorArgs([$this->dbException])
+            ->onlyMethods(['buscarPorNombre'])
+            ->getMock();
 
-            
-        $usuario = new Usuario($dbException);
-        // validarLogin atrapa la excepción y debe devolver ['exito' => false]
-        $result = $usuario->validarLogin('user', 'pass');
+        // Simula la excepción dentro del try de validarLogin
+        $usuario->method('buscarPorNombre')
+                ->willThrowException(new \PDOException('simulated DB error'));
+
+        // Al atrapar la excepción, validarLogin debe retornar ['exito' => false]
+        $result = $usuario->validarLogin('any', 'any');
+        $this->assertIsArray($result);
         $this->assertArrayHasKey('exito', $result);
         $this->assertFalse($result['exito']);
     }
