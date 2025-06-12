@@ -603,4 +603,36 @@ final class UsuarioTest extends TestCase
         // Sin filas: debe retornar false
         $this->assertFalse($usuario->incrementarConsultas(99));
     }
+    
+    //88
+    
+     public function testGuardarTokenRecuperacionException(): void
+    {
+        $usuario = new Usuario($this->dbException);
+        $this->assertFalse($usuario->guardarTokenRecuperacion(1, 'tok', '2025-01-01'));
+    }
+
+    public function testVerificarTokenRecuperacionException(): void
+    {
+        $usuario = new Usuario($this->dbException);
+        $this->assertFalse($usuario->verificarTokenRecuperacion('tok'));
+    }
+
+    public function testCambiarPasswordException(): void
+    {
+        $usuario = new Usuario($this->dbException);
+        $this->assertFalse($usuario->cambiarPassword(1, 'newpass'));
+    }
+
+    public function testMarcarTokenUsadoException(): void
+    {
+        $usuario = new Usuario($this->dbException);
+        $this->assertFalse($usuario->marcarTokenUsado('tok'));
+    }
+
+    public function testCalcularConsultasRestantesException(): void
+    {
+        $usuario = new Usuario($this->dbException);
+        $this->assertSame(0, $usuario->calcularConsultasRestantes(1));
+    }
 }
