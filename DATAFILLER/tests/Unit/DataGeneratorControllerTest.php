@@ -6,6 +6,17 @@ namespace App\Tests\Unit;
 use PHPUnit\Framework\TestCase;
 use App\Controllers\DataGeneratorController;
 
+// Stub temporal dentro de tests para Usuario
+namespace App\Models;
+class Usuario {
+    public function __construct($db) {}
+    public function obtenerInfoUsuario($usuario_id) {
+        return ['id' => 1, 'plan' => 'premium'];
+    }
+}
+
+namespace App\Tests\Unit; // Regresa al namespace correcto
+
 spl_autoload_register(function ($class) {
     if ($class === 'App\Config\Database') {
         require __DIR__ . '/Stubs/DatabaseStub.php';
