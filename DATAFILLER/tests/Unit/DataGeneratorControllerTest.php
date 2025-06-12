@@ -6,19 +6,8 @@ namespace App\Tests\Unit;
 use PHPUnit\Framework\TestCase;
 use App\Controllers\DataGeneratorController;
 
-// Stub de Usuario para evitar límite y conexión real a BD
-class UsuarioStub {
-    public function __construct($db) {}
-    public function obtenerInfoUsuario($usuario_id) {
-        return ['id' => $usuario_id, 'plan' => 'premium'];
-    }
-}
-
+// Puedes dejar SOLO el autoload para DatabaseStub si lo necesitas
 spl_autoload_register(function ($class) {
-    if ($class === 'App\Models\Usuario') {
-        require __DIR__ . '/Stubs/UsuarioStub.php';
-        return true;
-    }
     if ($class === 'App\Config\Database') {
         require __DIR__ . '/Stubs/DatabaseStub.php';
         return true;
