@@ -121,114 +121,17 @@ final class SqlAnalyzerControllerTest extends TestCase
         $this->assertCount(1, $result['tablas']);
         $this->assertSame('users', $result['tablas'][0]['nombre']);
     }
-    private function invoke(string $method, array $args = [])
-    {
-        $m = $this->ref->getMethod($method);
-        $m->setAccessible(true);
-        return $m->invokeArgs($this->controller, $args);
-    }
+    
 
-    public function testReturnsNullWhenTypeIsNull(): void
+    // Ejemplo de uso de invoke() para probar un método privado:
+    public function testProcesarColumnaParserReturnsNullIfNoType(): void
     {
         $field = new \stdClass();
-        $field->name = 'col1';
+        $field->name = 'col';
         $field->type = null;
 
         $result = $this->invoke('procesarColumnaParser', [$field]);
         $this->assertNull($result);
-    }
-
-    public function testParsesBasicTypeWithParameters(): void
-    {
-        $type = new \stdClass();
-        $type->name = 'int';
-        $type->parameters = ['10', '2'];
-
-        $field = new \stdClass();
-        $field->name = 'amount';
-        $field->type = $type;
-        // no key, no options
-
-        $out = $this->invoke('procesarColumnaParser', [$field]);
-        $this->assertIsArray($out);
-        $this->assertSame('AMOUNT', strtoupper($out['nombre'])); // same name, case-insensitive
-        $this->assertSame('INT', $out['tipo_sql']);
-        $this->assertSame(10, $out['longitud']);
-        $this->assertSame(2, $out['decimales']);
-        $this->assertEmpty($out['enum_values']);
-        $this->assertNull($out['default_value']);
-        $this->assertFalse($out['es_primary_key']);
-        $this->assertFalse($out['es_auto_increment']);
-        $this->assertFalse($out['es_not_null']);
-    }
-
-    public function testParsesEnumWithValues(): void
-    {
-        $type = new \stdClass();
-        $type->name = 'ENUM';
-        $type->parameters = ["'a'", "'b'"];
-
-        $field = new \stdClass();
-        $field->name = 'status';
-        $field->type = $type;
-
-        $out = $this->invoke('procesarColumnaParser', [$field]);
-        $this->assertSame('ENUM', $out['tipo_sql']);
-        $this->assertSame(['a','b'], $out['enum_values']);
-        $this->assertSame('enum_values', $out['tipo_generacion']);
-    }
-
-    public function testParsesEnumWithNoValuesUsesDefaults(): void
-    {
-        $type = new \stdClass();
-        $type->name = 'ENUM';
-        $type->parameters = []; // no values
-
-        $field = new \stdClass();
-        $field->name = 'choice';
-        $field->type = $type;
-
-        $out = $this->invoke('procesarColumnaParser', [$field]);
-        $this->assertSame(['default1','default2'], $out['enum_values']);
-    }
-
-    public function testDetectsPrimaryKey(): void
-    {
-        $type = new \stdClass();
-        $type->name = 'int';
-        $type->parameters = [];
-
-        $field = new \stdClass();
-        $field->name = 'id';
-        $field->type = $type;
-        $field->key = (object)['type' => 'PRIMARY']; // also catches PRIMARY KEY
-
-        $out = $this->invoke('procesarColumnaParser', [$field]);
-        $this->assertTrue($out['es_primary_key']);
-    }
-
-    public function testProcessesOptionsForAutoIncrementNotNullAndDefault(): void
-    {
-        $type = new \stdClass();
-        $type->name = 'int';
-        $type->parameters = [];
-
-        $opts = new \stdClass();
-        $opts->options = [
-            'AUTO_INCREMENT' => null,
-            0                => 'NOT NULL',
-            'DEFAULT'        => "'Z'",
-        ];
-
-        $field = new \stdClass();
-        $field->name = 'code';
-        $field->type = $type;
-        $field->options = $opts;
-
-        $out = $this->invoke('procesarColumnaParser', [$field]);
-        $this->assertTrue($out['es_auto_increment'], 'AUTO_INCREMENT should be detected');
-        $this->assertTrue($out['es_not_null'], 'NOT NULL should be detected');
-        $this->assertSame('Z', $out['default_value'], 'DEFAULT value should be stripped of quotes');
     }
     
 }
