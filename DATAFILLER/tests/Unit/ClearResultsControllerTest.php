@@ -10,15 +10,11 @@ final class ClearResultsControllerTest extends TestCase
 {
     protected function setUp(): void
     {
-        // Intenta cerrar la sesión si está activa y limpia $_SESSION
-        if (session_status() === PHP_SESSION_ACTIVE) {
-            session_unset();
-            session_destroy();
-        }
-        // Inicia la sesión antes de la prueba para evitar errores de headers
+        // Inicia la sesión solo si no está activa
         if (session_status() !== PHP_SESSION_ACTIVE) {
             @session_start();
         }
+        // Limpia el array de sesión
         $_SESSION = [];
     }
 
