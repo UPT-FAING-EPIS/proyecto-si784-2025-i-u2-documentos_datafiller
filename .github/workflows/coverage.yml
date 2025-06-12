@@ -24,13 +24,16 @@ jobs:
         working-directory: DATAFILLER
         run: composer install --no-interaction
 
+      - name: Ensure phpunit is executable
+        working-directory: DATAFILLER
+        run: chmod +x vendor/bin/phpunit
+
       - name: Run PHPUnit & Generate HTML Coverage
         working-directory: DATAFILLER
         run: |
-          vendor/bin/phpunit -c phpunit.xml --coverage-html coverage-report
+          php vendor/bin/phpunit -c phpunit.xml --coverage-html coverage-report
 
       - name: Upload coverage-report as artifact
-        # Actualiza a la versión soportada @v4 para evitar el error deprecado
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
