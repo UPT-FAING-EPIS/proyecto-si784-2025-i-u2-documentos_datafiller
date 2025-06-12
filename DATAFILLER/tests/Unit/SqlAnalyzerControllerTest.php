@@ -22,12 +22,10 @@ final class SqlAnalyzerControllerTest extends TestCase
     private int $usuarioId = 42;
     private string $dbType = 'sql';
     private SqlAnalyzerController $controller;
-    private ReflectionClass $ref; // <- Added ReflectionClass property
-
+    private ReflectionClass $ref;
 
     protected function setUp(): void
     {
-        // Evitar que el file-scope de tu controlador procese POST
         $_SERVER['REQUEST_METHOD'] = 'GET';
         if (session_status() === PHP_SESSION_ACTIVE) {
             session_unset();
@@ -35,16 +33,10 @@ final class SqlAnalyzerControllerTest extends TestCase
         }
         $_SESSION = [];
 
-        // Creamos una instancia limpia; al instanciar, el controlador
-        // hará new Database() pero cargará nuestro stub SQLite in‐memory.
         $this->controller = new SqlAnalyzerController();
-        $this->ref = new ReflectionClass(SqlAnalyzerController::class); // <- Initialize ReflectionClass
-
+        $this->ref = new ReflectionClass(SqlAnalyzerController::class);
     }
 
-    /** 
-     * Inyecta por reflexión el mock de Usuario y el mock de PDO
-     */
     private function injectDependencies(Usuario $usuarioMock, PDO $dbMock): void
     {
         $ref = new ReflectionClass($this->controller);
@@ -67,13 +59,11 @@ final class SqlAnalyzerControllerTest extends TestCase
 
     public function testLimiteConsultasAgotadoDevuelveError(): void
     {
-        // Usuario que ya no tiene consultas restantes
         $usuario = $this->createMock(Usuario::class);
         $usuario->method('obtenerConsultasRestantes')
                 ->with($this->usuarioId)
                 ->willReturn(0);
 
-        // PDO stub (no importa qué haga porque no llegamos a registrarConsulta)
         $db = $this->createMock(PDO::class);
 
         $this->injectDependencies($usuario, $db);
@@ -87,7 +77,6 @@ final class SqlAnalyzerControllerTest extends TestCase
 
     public function testSinTablasEnScriptDevuelveSinTablas(): void
     {
-        // Usuario con consultas OK
         $usuario = $this->createMock(Usuario::class);
         $usuario->method('obtenerConsultasRestantes')
                 ->willReturn(1);
@@ -96,7 +85,6 @@ final class SqlAnalyzerControllerTest extends TestCase
 
         $this->injectDependencies($usuario, $db);
 
-        // Script sin CREATE TABLE
         $result = $this->controller->analizarEstructura('NO HAY TABLAS', $this->dbType, $this->usuarioId);
 
         $this->assertFalse($result['exito']);
@@ -106,14 +94,12 @@ final class SqlAnalyzerControllerTest extends TestCase
 
     public function testEstructuraValidaDevuelveTablas(): void
     {
-        // Usuario con consultas OK y spy en incrementarConsultas()
         $usuario = $this->createMock(Usuario::class);
         $usuario->method('obtenerConsultasRestantes')->willReturn(1);
         $usuario->expects($this->once())
                 ->method('incrementarConsultas')
                 ->with($this->usuarioId);
 
-        // Stub de PDO / PDOStatement para que registrarConsulta no falle
         $db = $this->createMock(PDO::class);
         $stmt = $this->createMock(PDOStatement::class);
         $db->method('prepare')->willReturn($stmt);
@@ -122,7 +108,6 @@ final class SqlAnalyzerControllerTest extends TestCase
 
         $this->injectDependencies($usuario, $db);
 
-        // Script que sí contiene CREATE TABLE => fallback lo detecta
         $script = 'CREATE TABLE users (id INT);';
 
         $result = $this->controller->analizarEstructura($script, $this->dbType, $this->usuarioId);
@@ -132,7 +117,6 @@ final class SqlAnalyzerControllerTest extends TestCase
         $this->assertCount(1, $result['tablas']);
         $this->assertSame('users', $result['tablas'][0]['nombre']);
     }
-    
 
     public function testProcesarColumnaParserReturnsNullIfNoType(): void
     {
@@ -143,22 +127,24 @@ final class SqlAnalyzerControllerTest extends TestCase
         $result = $this->invoke('procesarColumnaParser', [$field]);
         $this->assertNull($result);
     }
-    
-    public function testProcesarColumnaParserEnumSinValores() {
-    $field = new \stdClass();
-    $field->name = 'col_enum';
-    $field->type = (object)[
-        'name' => 'ENUM',
-        'parameters' => [],
-    ];
-    $field->options = (object)['options' => []];
-    $result = $this->invoke('procesarColumnaParser', [$field]);
-    $this->assertIsArray($result);
-    $this->assertEquals('ENUM', $result['tipo_sql']);
-    $this->assertEquals(['default1', 'default2'], $result['enum_values']);
+
+    public function testProcesarColumnaParserEnumSinValores()
+    {
+        $field = new \stdClass();
+        $field->name = 'col_enum';
+        $field->type = (object)[
+            'name' => 'ENUM',
+            'parameters' => [],
+        ];
+        $field->options = (object)['options' => []];
+        $result = $this->invoke('procesarColumnaParser', [$field]);
+        $this->assertIsArray($result);
+        $this->assertEquals('ENUM', $result['tipo_sql']);
+        $this->assertEquals(['default1', 'default2'], $result['enum_values']);
     }
 
-    public function testProcesarColumnaParserConOpcionesVariadas() {
+    public function testProcesarColumnaParserConOpcionesVariadas()
+    {
         $field = new \stdClass();
         $field->name = 'col_test';
         $field->type = (object)[
@@ -166,7 +152,6 @@ final class SqlAnalyzerControllerTest extends TestCase
             'parameters' => [10],
         ];
         $field->key = (object)['type' => 'PRIMARY KEY'];
-        // Simula opciones de not null y default
         $field->options = (object)['options' => [
             'not null' => 'NOT NULL',
             'auto_increment' => 'AUTO_INCREMENT',
@@ -179,7 +164,8 @@ final class SqlAnalyzerControllerTest extends TestCase
         $this->assertEquals('valor', $result['default_value']);
     }
 
-    public function testConstruirModificadores() {
+    public function testConstruirModificadores()
+    {
         $result = $this->invoke('construirModificadores', [true, true, true, 'valor']);
         $this->assertStringContainsString('NOT NULL', $result);
         $this->assertStringContainsString('AUTO_INCREMENT', $result);
@@ -187,7 +173,8 @@ final class SqlAnalyzerControllerTest extends TestCase
         $this->assertStringContainsString("DEFAULT 'valor'", $result);
     }
 
-    public function testLimpiarScript() {
+    public function testLimpiarScript()
+    {
         $script = "-- comentario\nCREATE TABLE test (id INT);\n/* otro */\nSET NAMES utf8;\nUSE mi_db;";
         $result = $this->invoke('limpiarScript', [$script]);
         $this->assertStringNotContainsString('--', $result);
@@ -197,7 +184,8 @@ final class SqlAnalyzerControllerTest extends TestCase
         $this->assertStringContainsString('CREATE TABLE', $result);
     }
 
-    public function testDeterminarTipoGeneracionPorNombre() {
+    public function testDeterminarTipoGeneracionPorNombre()
+    {
         $this->assertEquals('numero_entero', $this->invoke('determinarTipoGeneracion', ['id', 'INT', '', [], false]));
         $this->assertEquals('nombre_persona', $this->invoke('determinarTipoGeneracion', ['nombre_completo', 'VARCHAR', '', [], false]));
         $this->assertEquals('email', $this->invoke('determinarTipoGeneracion', ['email_usuario', 'VARCHAR', '', [], false]));
@@ -209,38 +197,39 @@ final class SqlAnalyzerControllerTest extends TestCase
         $this->assertEquals('enum_values', $this->invoke('determinarTipoGeneracion', ['estado', 'ENUM', '', ['A', 'B'], false]));
         $this->assertEquals('texto_aleatorio', $this->invoke('determinarTipoGeneracion', ['campoX', 'VARCHAR', '', [], false]));
     }
-    public function testAnalizarTablaConParserProcesaColumnasYForeignKey() {
-        // Mock de campo normal
-        $col = $this->getMockBuilder(\stdClass::class)->getMock();
+
+    public function testAnalizarTablaConParserProcesaColumnasYForeignKey()
+    {
+        // Campo normal
+        $col = new \stdClass();
         $col->name = 'id';
         $col->type = (object)['name' => 'INT', 'parameters' => [11]];
         $col->options = (object)['options' => []];
         $col->key = (object)['type' => 'PRIMARY KEY'];
 
-        // Mock de campo foreign key
-        $fk = $this->getMockBuilder(\stdClass::class)->getMock();
+        // Campo foreign key
+        $fk = new \stdClass();
         $fk->name = 'cliente_id';
         $fk->type = (object)['name' => 'INT', 'parameters' => [11]];
-        $fk->options = (object)['options' => []];
+        $fk->options = (object)['options' => [];
         $fk->key = (object)['type' => 'FOREIGN KEY'];
         $fk->references = (object)[
             'table' => 'clientes',
             'columns' => ['id']
         ];
 
-        // Statement simulado
-        $stmt = $this->getMockBuilder(\stdClass::class)->getMock();
-        $stmt->name = (object)['table' => 'facturas'];
-        $stmt->fields = [$col, $fk];
-        $stmt->build = function() { return 'CREATE TABLE facturas...'; }; // Closure para simular build()
+        // Statement simulado con método build real
+        $statement = new class($col, $fk) {
+            public $name;
+            public $fields;
+            public function __construct($col, $fk) {
+                $this->name = (object)['table' => 'facturas'];
+                $this->fields = [$col, $fk];
+            }
+            public function build() { return 'CREATE TABLE facturas...'; }
+        };
 
-        // Sobreescribe build() para el mock
-        $reflection = new \ReflectionClass($stmt);
-        $property = $reflection->getProperty('build');
-        $property->setAccessible(true);
-        $property->setValue($stmt, function() { return 'CREATE TABLE facturas...'; });
-
-        $result = $this->invoke('analizarTablaConParser', [$stmt]);
+        $result = $this->invoke('analizarTablaConParser', [$statement]);
         $this->assertIsArray($result);
         $this->assertEquals('facturas', $result['nombre']);
         $this->assertCount(2, $result['columnas']);
@@ -248,7 +237,9 @@ final class SqlAnalyzerControllerTest extends TestCase
         $this->assertEquals('clientes', $result['columnas'][1]['references_table']);
         $this->assertEquals('id', $result['columnas'][1]['references_column']);
     }
-    public function testExtraerColumnasFallbackMejoradoCubreTodosLosCasos() {
+
+    public function testExtraerColumnasFallbackMejoradoCubreTodosLosCasos()
+    {
         $definicion = "
             `id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
             `nombre` VARCHAR(100) NOT NULL,
@@ -264,26 +255,28 @@ final class SqlAnalyzerControllerTest extends TestCase
         $this->assertEquals('A', $result[2]['enum_values'][0]);
         $this->assertEquals('A', $result[2]['default_value']);
         $this->assertEquals('numero_decimal', $result[3]['tipo_generacion']);
-        $this->assertTrue($result[0]['es_foreign_key']); // Por la FK aplicada
+        // La columna id es tanto primary key como foreign key según la definición
+        $this->assertTrue($result[0]['es_foreign_key']);
         $this->assertEquals('clientes', $result[0]['references_table']);
     }
-    public function testDividirPorComasSegurasConCasosComplejos() {
-        // Caso simple
+
+    public function testDividirPorComasSegurasConCasosComplejos()
+    {
         $input1 = "id INT, nombre VARCHAR(100), edad INT";
         $result1 = $this->invoke('dividirPorComasSeguras', [$input1]);
         $this->assertCount(3, $result1);
 
-        // Caso con comas en ENUM y paréntesis
         $input2 = "`estado` ENUM('A','B','C'), `info` VARCHAR(20)";
         $result2 = $this->invoke('dividirPorComasSeguras', [$input2]);
         $this->assertCount(2, $result2);
 
-        // Caso con comillas dobles y paréntesis
         $input3 = "`descripcion` VARCHAR(255), `json` TEXT, `etiqueta` VARCHAR(10)";
         $result3 = $this->invoke('dividirPorComasSeguras', [$input3]);
         $this->assertCount(3, $result3);
     }
-    public function testDeterminarTipoGeneracionSwitches() {
+
+    public function testDeterminarTipoGeneracionSwitches()
+    {
         $this->assertEquals('texto_aleatorio', $this->invoke('determinarTipoGeneracion', ['campo', 'VARCHAR', '', [], false]));
         $this->assertEquals('numero_entero', $this->invoke('determinarTipoGeneracion', ['campo', 'BIGINT', '', [], false]));
         $this->assertEquals('numero_decimal', $this->invoke('determinarTipoGeneracion', ['campo', 'DOUBLE', '', [], false]));
@@ -291,10 +284,16 @@ final class SqlAnalyzerControllerTest extends TestCase
         $this->assertEquals('fecha_hora', $this->invoke('determinarTipoGeneracion', ['campo', 'TIMESTAMP', '', [], false]));
         $this->assertEquals('booleano', $this->invoke('determinarTipoGeneracion', ['campo', 'BOOL', '', [], false]));
     }
-    public function testAnalizarTablaConParserCatch() {
-        $stmt = $this->getMockBuilder(\stdClass::class)->getMock();
-        // No tiene propiedad name, lanzará excepción
-        $result = $this->invoke('analizarTablaConParser', [$stmt]);
+
+    public function testAnalizarTablaConParserCatch()
+    {
+        // Simular un error accediendo a 'name'
+        $statement = new class {
+            public function __get($name) {
+                throw new \Exception("Simulated property access error");
+            }
+        };
+        $result = $this->invoke('analizarTablaConParser', [$statement]);
         $this->assertNull($result);
     }
 }
