@@ -6,18 +6,12 @@ namespace App\Tests\Unit;
 use PHPUnit\Framework\TestCase;
 use App\Controllers\DataGeneratorController;
 
-// Stub temporal dentro de tests para Usuario
-namespace App\Models;
-class Usuario {
-    public function __construct($db) {}
-    public function obtenerInfoUsuario($usuario_id) {
-        return ['id' => 1, 'plan' => 'premium'];
-    }
-}
-
-namespace App\Tests\Unit; // Regresa al namespace correcto
-
+// Carga el stub SOLO si se requiere App\Models\Usuario
 spl_autoload_register(function ($class) {
+    if ($class === 'App\Models\Usuario') {
+        require __DIR__ . '/Stubs/UsuarioStub.php';
+        return true;
+    }
     if ($class === 'App\Config\Database') {
         require __DIR__ . '/Stubs/DatabaseStub.php';
         return true;
@@ -65,26 +59,6 @@ final class DataGeneratorControllerTest extends TestCase
 
         $_SESSION['usuario'] = ['id' => 1];
         $controller = new DataGeneratorController('es_ES');
-
-        // Mock de Usuario SOLO para este test
-        $usuarioMock = $this->getMockBuilder(\App\Models\Usuario::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['obtenerInfoUsuario'])
-            ->getMock();
-        $usuarioMock->method('obtenerInfoUsuario')->willReturn([
-            'id' => 1,
-            'plan' => 'premium'
-        ]);
-        // Inyecta el mock en el controlador antes de llamar a generarDatos
-        $refCtrl = new \ReflectionClass($controller);
-        if ($refCtrl->hasProperty('usuario')) {
-            $propUsuario = $refCtrl->getProperty('usuario');
-            $propUsuario->setAccessible(true);
-            $propUsuario->setValue($controller, $usuarioMock);
-        } else {
-            // Si tu controlador usa otro nombre para la propiedad del modelo Usuario, cámbialo aquí
-            $this->fail('No se encontró property usuario en DataGeneratorController');
-        }
 
         $pdo = $this->getPrivatePdo($controller);
         $pdo->exec("
