@@ -103,6 +103,7 @@ final class UsuarioTest extends TestCase
         $usuario->email = 'm@e';
         $usuario->password = 'pwd';
 
+        
         // bindParam ok, pero execute falla
         $this->stmtMock->method('bindParam')->willReturn(true);
         $this->stmtMock->method('execute')->willReturn(false);
