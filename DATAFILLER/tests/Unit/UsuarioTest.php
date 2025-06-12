@@ -492,4 +492,73 @@ final class UsuarioTest extends TestCase
         ]);
         $this->assertSame(3, $spy3->calcularConsultasRestantes(17));
     }
+    
+
+    public function testPuedeRealizarConsultaUsuarioNoExiste(): void
+    {
+        // rowCount = 0 should hit the `return false;` path in try block
+        $this->stmtMock
+            ->method('rowCount')
+            ->willReturn(0);
+
+        $usuario = new Usuario($this->dbMock);
+        $this->assertFalse($usuario->puedeRealizarConsulta(999));
+    }
+
+   
+
+    public function testValidarLoginUsuarioNoExiste(): void
+    {
+        // buscarPorNombre returns false, so validarLogin should return exito=false
+        $spy = $this->getMockBuilder(Usuario::class)
+            ->setConstructorArgs([$this->dbMock])
+            ->onlyMethods(['buscarPorNombre'])
+            ->getMock();
+
+        $spy->method('buscarPorNombre')
+            ->willReturn(false);
+
+        $result = $spy->validarLogin('nonexistent', 'any');
+        $this->assertFalse($result['exito']);
+    }
+    public function testIncrementarConsultasNuevoDia(): void
+    {
+        // Simula que no hubo consultas el mismo día (fecha anterior)
+        $today = date('Y-m-d');
+        $yesterday = date('Y-m-d', strtotime('-1 day'));
+
+        // rowCount = 1 para entrar al if
+        $this->stmtMock
+            ->method('rowCount')
+            ->willReturn(1);
+        // fetch devuelve fecha_ultima_consulta distinta a hoy
+        $this->stmtMock
+            ->method('fetch')
+            ->willReturn([
+                'consultas_diarias' => 5,
+                'fecha_ultima_consulta' => $yesterday
+            ]);
+
+        // execute() se debe llamar dos veces (SELECT + UPDATE)
+        $this->stmtMock
+            ->expects($this->exactly(2))
+            ->method('execute')
+            ->willReturn(true);
+
+        $usuario = new Usuario($this->dbMock);
+        // Nuevo día: debe resetear a 1 y devolver true
+        $this->assertTrue($usuario->incrementarConsultas(42));
+    }
+
+    public function testIncrementarConsultasSinRegistros(): void
+    {
+        // Simula que no existe registro previo: rowCount = 0
+        $this->stmtMock
+            ->method('rowCount')
+            ->willReturn(0);
+
+        $usuario = new Usuario($this->dbMock);
+        // Sin filas: debe retornar false
+        $this->assertFalse($usuario->incrementarConsultas(99));
+    }
 }
