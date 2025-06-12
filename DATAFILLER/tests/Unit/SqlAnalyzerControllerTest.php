@@ -6,7 +6,6 @@ namespace App\Tests\Unit;
 if (!class_exists('\PhpMyAdmin\SqlParser\Components\CreateDefinition')) {
     eval('namespace PhpMyAdmin\SqlParser\Components; class CreateDefinition {}');
 }
-require_once __DIR__ . '/../../controllers/DebugHelper.php'; // <--- AGREGAR ESTA LÍNEA
 
 
 use PHPUnit\Framework\TestCase;
@@ -244,11 +243,5 @@ final class SqlAnalyzerControllerTest extends TestCase
         $this->assertEquals('booleano', $this->invoke('determinarTipoGeneracion', ['campo', 'BOOL', '', [], false]));
     }
 
-    public function testDebugLogCubreFuncion()
-    {
-        // Llama a la función con un mensaje de prueba
-        debug_log('Cobertura de debug_log');
-        // No se requieren asserts, solo llamar para cubrir la función
-        $this->assertTrue(true);
-    }
+    
 }
