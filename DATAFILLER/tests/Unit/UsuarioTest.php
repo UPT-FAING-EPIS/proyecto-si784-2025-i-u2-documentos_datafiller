@@ -422,6 +422,31 @@ final class UsuarioTest extends TestCase
         $this->assertTrue($usuario->cambiarPassword(14, 'newpass'));
         $this->assertTrue($usuario->marcarTokenUsado('tok'));
     }
+
+    public function testLimpiarTokensExpiradosExecuteFails(): void
+    {
+        // Preparar un stmt que devuelva false en execute()
+        $this->stmtMock
+            ->method('execute')
+            ->willReturn(false);
+
+        $usuario = new Usuario($this->dbMock);
+        // Si execute() falla, debe devolver false
+        $this->assertFalse($usuario->limpiarTokensExpirados());
+    }
+
+    public function testLimpiarTokensExpiradosException(): void
+    {
+        // Simular excepción en prepare()
+        $dbException = $this->createMock(\PDO::class);
+        $dbException
+            ->method('prepare')
+            ->willThrowException(new \PDOException('DB error'));
+
+        $usuario = new Usuario($dbException);
+        // Al lanzarse PDOException, debe atraparse y devolver false
+        $this->assertFalse($usuario->limpiarTokensExpirados());
+    }
     public function testObtenerPlanUsuario(): void
     {
         // caso encuentra plan
