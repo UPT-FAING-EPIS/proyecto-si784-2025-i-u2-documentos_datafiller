@@ -6,8 +6,8 @@
     <link rel="stylesheet" href="../../public/css/styles.css">
     <link rel="stylesheet" href="../../public/css/auth.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- EmailJS CDN -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <!-- EmailJS CDN - VERSIÓN CORRECTA -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 <body>
     <div class="registro-container">

@@ -1,23 +1,39 @@
 // https://www.emailjs.com/
 
 (function() {
-    emailjs.init("Y5F72MyWAkxwD3oXU"); // Tu clave pública
+    // NUEVA SINTAXIS DE INICIALIZACIÓN
+    emailjs.init({
+        publicKey: "Y5F72MyWAkxwD3oXU"
+    });
 })();
 
 function enviarEmailRecuperacion(email, nombre, token) {
     const templateParams = {
-        email: email,  // Para {{email}} en el template
-        link: `https://datafiller3.sytes.net/views/Auth/nueva_password.php?token=${token}` // Para {{link}} en el template
+        to_email: email,  // Cambiar a to_email
+        user_name: nombre, // Agregar nombre si lo necesitas
+        recovery_link: `https://datafiller3.sytes.net/views/Auth/nueva_password.php?token=${token}` // Cambiar a recovery_link
     };
     
-    // CORREGIDO: Usar los IDs reales que me mostraste
+    console.log('🔍 Enviando email con parámetros:', templateParams);
+    
+    // USAR LA NUEVA API
     emailjs.send('service_n0eq7qa', 'template_o9hdtmh', templateParams)
         .then(function(response) {
-            console.log('Email enviado!', response.status, response.text);
+            console.log('✅ Email enviado exitosamente!', response.status, response.text);
             mostrarMensaje('✅ Se ha enviado un enlace de recuperación a tu email. Revisa tu bandeja de entrada.', 'success');
-        }, function(error) {
-            console.log('Error:', error);
-            mostrarMensaje('❌ Error enviando el email. Intente nuevamente.', 'error');
+        })
+        .catch(function(error) {
+            console.error('❌ Error completo:', error);
+            console.log('Status:', error.status);
+            console.log('Text:', error.text);
+            
+            if(error.status === 404) {
+                mostrarMensaje('❌ Servicio de email no disponible. Verifica tu configuración.', 'error');
+            } else if(error.status === 422) {
+                mostrarMensaje('❌ Error en los parámetros del email. Contacta al administrador.', 'error');
+            } else {
+                mostrarMensaje('❌ Error enviando el email. Intente nuevamente.', 'error');
+            }
         });
 }
 
