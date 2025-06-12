@@ -22,6 +22,11 @@ final class UsuarioTest extends TestCase
         $this->dbMock
             ->method('prepare')
             ->willReturn($this->stmtMock);
+
+        // Por defecto, execute() no falla
+        $this->stmtMock
+            ->method('execute')
+            ->willReturn(true);
     }
 
     public function testCrearDevuelveFalseCuandoYaExisteUsuario(): void
@@ -40,7 +45,7 @@ final class UsuarioTest extends TestCase
         $usuario->expects($this->once())
                 ->method('buscarPorNombre')
                 ->with('juan')
-                ->willReturn(['id'=>1,'nombre'=>'juan']);
+                ->willReturn(['id' => 1, 'nombre' => 'juan']);
 
         $this->assertFalse($usuario->crear());
     }
@@ -60,8 +65,7 @@ final class UsuarioTest extends TestCase
 
         $usuario->method('buscarPorNombre')->willReturn(false);
 
-        $this->stmtMock->method('bindParam')->willReturn(true);
-        $this->stmtMock->expects($this->once())->method('execute')->willReturn(true);
+        // Simular el lastInsertId() como string
         $this->dbMock->method('lastInsertId')->willReturn('123');
 
         $this->assertTrue($usuario->crear());
@@ -71,24 +75,32 @@ final class UsuarioTest extends TestCase
     public function testBuscarPorNombre(): void
     {
         $data = [
-            'id'=>5,
-            'nombre'=>'pep',
-            'apellido_paterno'=>'p',
-            'apellido_materno'=>'m',
-            'email'=>'p@e'
+            'id' => 5,
+            'nombre' => 'pep',
+            'apellido_paterno' => 'p',
+            'apellido_materno' => 'm',
+            'email' => 'p@e'
         ];
-        $this->stmtMock->expects($this->once())->method('execute');
-        $this->stmtMock->method('rowCount')->willReturn(1);
-        $this->stmtMock->method('fetch')
-                       ->with(PDO::FETCH_ASSOC)
-                       ->willReturn($data);
+
+        // rowCount y fetch para llamadas consecutivas
+        $this->stmtMock
+            ->method('rowCount')
+            ->willReturnOnConsecutiveCalls(1, 0);
+
+        $this->stmtMock
+            ->method('fetch')
+            ->with(PDO::FETCH_ASSOC)
+            ->willReturn($data);
 
         $usuario = new Usuario($this->dbMock);
-        $this->assertSame($data, $usuario->buscarPorNombre('pep'));
 
-        // Cuando no existe
-        $this->stmtMock->method('rowCount')->willReturn(0);
-        $this->assertFalse($usuario->buscarPorNombre('nadie'));
+        // Primer llamada: existe
+        $result1 = $usuario->buscarPorNombre('pep');
+        $this->assertSame($data, $result1);
+
+        // Segunda llamada: no existe
+        $result2 = $usuario->buscarPorNombre('nadie');
+        $this->assertFalse($result2);
     }
 
     public function testValidarLoginExitoYFallo(): void
@@ -102,11 +114,11 @@ final class UsuarioTest extends TestCase
         $spy->method('buscarPorNombre')
             ->with('u')
             ->willReturn([
-                'id'=>9,
-                'nombre'=>'u',
-                'apellido_paterno'=>'p',
-                'email'=>'u@e',
-                'password'=>$hash
+                'id' => 9,
+                'nombre' => 'u',
+                'apellido_paterno' => 'p',
+                'email' => 'u@e',
+                'password' => $hash
             ]);
 
         $ok = $spy->validarLogin('u', 'secret');
@@ -119,12 +131,16 @@ final class UsuarioTest extends TestCase
 
     public function testPuedeRealizarConsultaPremium(): void
     {
-        $this->stmtMock->method('rowCount')->willReturn(1);
-        $this->stmtMock->method('fetch')->willReturn([
-            'tipo_plan'=>'premium',
-            'consultas_diarias'=>10,
-            'fecha_ultima_consulta'=>'2000-01-01'
-        ]);
+        $this->stmtMock
+            ->method('rowCount')
+            ->willReturn(1);
+        $this->stmtMock
+            ->method('fetch')
+            ->willReturn([
+                'tipo_plan' => 'premium',
+                'consultas_diarias' => 10,
+                'fecha_ultima_consulta' => '2000-01-01'
+            ]);
 
         $usuario = new Usuario($this->dbMock);
         $this->assertTrue($usuario->puedeRealizarConsulta(1));
@@ -132,12 +148,16 @@ final class UsuarioTest extends TestCase
 
     public function testPuedeRealizarConsultaNuevoDia(): void
     {
-        $this->stmtMock->method('rowCount')->willReturn(1);
-        $this->stmtMock->method('fetch')->willReturn([
-            'tipo_plan'=>'gratuito',
-            'consultas_diarias'=>3,
-            'fecha_ultima_consulta'=>'2000-01-01'
-        ]);
+        $this->stmtMock
+            ->method('rowCount')
+            ->willReturn(1);
+        $this->stmtMock
+            ->method('fetch')
+            ->willReturn([
+                'tipo_plan' => 'gratuito',
+                'consultas_diarias' => 3,
+                'fecha_ultima_consulta' => '2000-01-01'
+            ]);
 
         $usuario = new Usuario($this->dbMock);
         $this->assertTrue($usuario->puedeRealizarConsulta(2));
@@ -146,12 +166,16 @@ final class UsuarioTest extends TestCase
     public function testPuedeRealizarConsultaMismoDiaMenosLimite(): void
     {
         $today = date('Y-m-d');
-        $this->stmtMock->method('rowCount')->willReturn(1);
-        $this->stmtMock->method('fetch')->willReturn([
-            'tipo_plan'=>'gratuito',
-            'consultas_diarias'=>1,
-            'fecha_ultima_consulta'=>$today
-        ]);
+        $this->stmtMock
+            ->method('rowCount')
+            ->willReturn(1);
+        $this->stmtMock
+            ->method('fetch')
+            ->willReturn([
+                'tipo_plan' => 'gratuito',
+                'consultas_diarias' => 1,
+                'fecha_ultima_consulta' => $today
+            ]);
 
         $usuario = new Usuario($this->dbMock);
         $this->assertTrue($usuario->puedeRealizarConsulta(3));
@@ -160,12 +184,16 @@ final class UsuarioTest extends TestCase
     public function testPuedeRealizarConsultaMismoDiaMaximo(): void
     {
         $today = date('Y-m-d');
-        $this->stmtMock->method('rowCount')->willReturn(1);
-        $this->stmtMock->method('fetch')->willReturn([
-            'tipo_plan'=>'gratuito',
-            'consultas_diarias'=>3,
-            'fecha_ultima_consulta'=>$today
-        ]);
+        $this->stmtMock
+            ->method('rowCount')
+            ->willReturn(1);
+        $this->stmtMock
+            ->method('fetch')
+            ->willReturn([
+                'tipo_plan' => 'gratuito',
+                'consultas_diarias' => 3,
+                'fecha_ultima_consulta' => $today
+            ]);
 
         $usuario = new Usuario($this->dbMock);
         $this->assertFalse($usuario->puedeRealizarConsulta(4));
@@ -175,18 +203,19 @@ final class UsuarioTest extends TestCase
     {
         $today = date('Y-m-d');
 
-        // Primera consulta: SELECT
-        $this->stmtMock->expects($this->exactly(1))
-                       ->method('rowCount')
-                       ->willReturn(1);
-        $this->stmtMock->expects($this->exactly(1))
-                       ->method('fetch')
-                       ->willReturn(['consultas_diarias'=>2,'fecha_ultima_consulta'=>$today]);
+        // rowCount y fetch para la primera lectura
+        $this->stmtMock
+            ->method('rowCount')
+            ->willReturn(1);
+        $this->stmtMock
+            ->method('fetch')
+            ->willReturn(['consultas_diarias' => 2, 'fecha_ultima_consulta' => $today]);
 
-        // La llamada a execute: una para SELECT (no revisada) y otra para UPDATE
-        $this->stmtMock->expects($this->exactly(2))
-                       ->method('execute')
-                       ->willReturn(true);
+        // execute() se llamará dos veces (SELECT + UPDATE)
+        $this->stmtMock
+            ->expects($this->exactly(2))
+            ->method('execute')
+            ->willReturn(true);
 
         $usuario = new Usuario($this->dbMock);
         $this->assertTrue($usuario->incrementarConsultas(5));
@@ -194,83 +223,117 @@ final class UsuarioTest extends TestCase
 
     public function testObtenerConsultasHoy(): void
     {
-        $this->stmtMock->method('rowCount')->willReturn(1);
-        $this->stmtMock->method('fetch')->willReturn(['consultas_diarias'=>2]);
+        // Caso con registro
+        $this->stmtMock
+            ->method('rowCount')
+            ->willReturnOnConsecutiveCalls(1, 0);
+        $this->stmtMock
+            ->method('fetch')
+            ->willReturn(['consultas_diarias' => 2]);
 
         $usuario = new Usuario($this->dbMock);
-        $this->assertSame(2, $usuario->obtenerConsultasHoy(7));
 
-        // Sin registro
-        $this->stmtMock->method('rowCount')->willReturn(0);
+        $this->assertSame(2, $usuario->obtenerConsultasHoy(7));
+        // Sin registro hoy
         $this->assertSame(0, $usuario->obtenerConsultasHoy(8));
     }
 
     public function testObtenerConsultasRestantes(): void
     {
         $today = date('Y-m-d');
-        $spy = $this->getMockBuilder(Usuario::class)
+
+        // Premium
+        $spy1 = $this->getMockBuilder(Usuario::class)
             ->setConstructorArgs([$this->dbMock])
             ->onlyMethods(['obtenerInfoUsuario'])
             ->getMock();
-
-        // Premium
-        $spy->method('obtenerInfoUsuario')->willReturn([
-            'plan'=>'premium',
-            'consultas_diarias'=>0,
-            'fecha_ultima_consulta'=>$today
-        ]);
-        $this->assertGreaterThan(100, $spy->obtenerConsultasRestantes(9));
+        $spy1->method('obtenerInfoUsuario')
+             ->willReturn([
+                 'plan' => 'premium',
+                 'consultas_diarias' => 0,
+                 'fecha_ultima_consulta' => $today
+             ]);
+        $this->assertGreaterThan(100, $spy1->obtenerConsultasRestantes(9));
 
         // Gratuito mismo día
-        $spy->method('obtenerInfoUsuario')->willReturn([
-            'plan'=>'gratuito',
-            'consultas_diarias'=>1,
-            'fecha_ultima_consulta'=>$today
-        ]);
-        $this->assertSame(2, $spy->obtenerConsultasRestantes(9));
+        $spy2 = $this->getMockBuilder(Usuario::class)
+            ->setConstructorArgs([$this->dbMock])
+            ->onlyMethods(['obtenerInfoUsuario'])
+            ->getMock();
+        $spy2->method('obtenerInfoUsuario')
+             ->willReturn([
+                 'plan' => 'gratuito',
+                 'consultas_diarias' => 1,
+                 'fecha_ultima_consulta' => $today
+             ]);
+        $this->assertSame(2, $spy2->obtenerConsultasRestantes(9));
 
-        // Gratuito nuevo día
-        $spy->method('obtenerInfoUsuario')->willReturn([
-            'plan'=>'gratuito',
-            'consultas_diarias'=>3,
-            'fecha_ultima_consulta'=>'2000-01-01'
-        ]);
-        $this->assertSame(3, $spy->obtenerConsultasRestantes(9));
+        // Nuevo día
+        $spy3 = $this->getMockBuilder(Usuario::class)
+            ->setConstructorArgs([$this->dbMock])
+            ->onlyMethods(['obtenerInfoUsuario'])
+            ->getMock();
+        $spy3->method('obtenerInfoUsuario')
+             ->willReturn([
+                 'plan' => 'gratuito',
+                 'consultas_diarias' => 3,
+                 'fecha_ultima_consulta' => '2000-01-01'
+             ]);
+        $this->assertSame(3, $spy3->obtenerConsultasRestantes(9));
     }
 
     public function testActualizarPlan(): void
     {
-        $this->stmtMock->method('execute')->willReturn(true);
+        // prepare() + bindParam no fallan; controlamos solo execute()
+        $this->stmtMock
+            ->expects($this->exactly(2))
+            ->method('execute')
+            ->willReturnOnConsecutiveCalls(true, false);
+
         $usuario = new Usuario($this->dbMock);
         $this->assertTrue($usuario->actualizarPlan(10, 'premium'));
-
-        $this->stmtMock->method('execute')->willReturn(false);
         $this->assertFalse($usuario->actualizarPlan(10, 'gratuito'));
     }
 
     public function testExisteUsuario(): void
     {
-        $this->stmtMock->method('rowCount')->willReturn(1);
+        $this->stmtMock
+            ->expects($this->exactly(2))
+            ->method('rowCount')
+            ->willReturnOnConsecutiveCalls(1, 0);
+
         $usuario = new Usuario($this->dbMock);
         $this->assertTrue($usuario->existeUsuario(11));
-
-        $this->stmtMock->method('rowCount')->willReturn(0);
         $this->assertFalse($usuario->existeUsuario(12));
     }
 
     public function testCrudTokensYPassword(): void
     {
-        $this->stmtMock->method('execute')->willReturn(true);
-        $usuario = new Usuario($this->dbMock);
+        // limpiarTokensExpirados + guardarTokenRecuperacion
+        $this->stmtMock
+            ->expects($this->exactly(2))
+            ->method('execute')
+            ->willReturn(true);
 
+        $usuario = new Usuario($this->dbMock);
         $this->assertTrue($usuario->limpiarTokensExpirados());
         $this->assertTrue($usuario->guardarTokenRecuperacion(13, 'tok', '2025-01-01'));
 
-        $this->stmtMock->method('rowCount')->willReturn(1);
-        $this->stmtMock->method('fetch')->willReturn(['token'=>'tok','email'=>'e','nombre'=>'n']);
+        // verificarTokenRecuperacion
+        $this->stmtMock
+            ->method('rowCount')
+            ->willReturn(1);
+        $this->stmtMock
+            ->method('fetch')
+            ->willReturn(['token'=>'tok','email'=>'e','nombre'=>'n']);
         $this->assertIsArray($usuario->verificarTokenRecuperacion('tok'));
 
-        $this->stmtMock->method('execute')->willReturn(true);
+        // cambiarPassword + marcarTokenUsado
+        $this->stmtMock
+            ->expects($this->exactly(2))
+            ->method('execute')
+            ->willReturn(true);
+
         $this->assertTrue($usuario->cambiarPassword(14, 'newpass'));
         $this->assertTrue($usuario->marcarTokenUsado('tok'));
     }
