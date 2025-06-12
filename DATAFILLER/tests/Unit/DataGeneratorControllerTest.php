@@ -6,19 +6,17 @@ namespace App\Tests\Unit;
 use PHPUnit\Framework\TestCase;
 use App\Controllers\DataGeneratorController;
 
-// Stub mínimo del modelo Usuario para testear límites
+// Stub de Usuario para evitar límite y conexión real a BD
 class UsuarioStub {
     public function __construct($db) {}
     public function obtenerInfoUsuario($usuario_id) {
-        // Siempre premium para evitar límite
         return ['id' => $usuario_id, 'plan' => 'premium'];
     }
 }
 
-// Autoloader para inyectar el stub de Usuario y el stub de Database (PDO in-memory)
 spl_autoload_register(function ($class) {
     if ($class === 'App\Models\Usuario') {
-        eval('namespace App\Models; class Usuario extends \App\Tests\Unit\UsuarioStub {}');
+        require __DIR__ . '/Stubs/UsuarioStub.php';
         return true;
     }
     if ($class === 'App\Config\Database') {
@@ -37,13 +35,13 @@ final class DataGeneratorControllerTest extends TestCase
         }
         $_SESSION = [];
         $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
-        $_SERVER['REQUEST_METHOD'] = 'CLI'; // Esto evita el error del controlador fuera de la clase
+        $_SERVER['REQUEST_METHOD'] = 'CLI'; // Previene ejecución automática del controlador
         $_POST['formato_salida'] = 'sql';
     }
 
     public function testGenerarDatosBasico(): void
     {
-        // Configuración mínima: 1 tabla, 1 columna
+        // Configuración simple: 1 tabla, 1 columna
         $config = [
             'formato_salida' => 'sql',
             'idioma_datos' => 'es_ES',
@@ -70,7 +68,7 @@ final class DataGeneratorControllerTest extends TestCase
         $_SESSION['usuario'] = ['id' => 1];
         $controller = new DataGeneratorController('es_ES');
 
-        // ----- CREA LA TABLA tbauditoria_consultas -----
+        // Crear tabla auditoría en el PDO stub antes de llamar a generarDatos
         $pdo = $this->getPrivatePdo($controller);
         $pdo->exec("
             CREATE TABLE tbauditoria_consultas (
@@ -92,9 +90,6 @@ final class DataGeneratorControllerTest extends TestCase
         $this->assertStringContainsString('INSERT INTO `usuarios`', $result['contenido']);
     }
 
-    /**
-     * Helper para obtener el PDO real desde el controlador (igual que en AnalyticsControllerTest)
-     */
     private function getPrivatePdo($controller): \PDO
     {
         $ref = new \ReflectionClass($controller);
