@@ -134,7 +134,6 @@ final class SqlAnalyzerControllerTest extends TestCase
     }
     
 
-    // Ejemplo de uso de invoke() para probar un método privado:
     public function testProcesarColumnaParserReturnsNullIfNoType(): void
     {
         $field = new \stdClass();
@@ -145,4 +144,69 @@ final class SqlAnalyzerControllerTest extends TestCase
         $this->assertNull($result);
     }
     
+    public function testProcesarColumnaParserEnumSinValores() {
+    $field = new \stdClass();
+    $field->name = 'col_enum';
+    $field->type = (object)[
+        'name' => 'ENUM',
+        'parameters' => [],
+    ];
+    $field->options = (object)['options' => []];
+    $result = $this->invoke('procesarColumnaParser', [$field]);
+    $this->assertIsArray($result);
+    $this->assertEquals('ENUM', $result['tipo_sql']);
+    $this->assertEquals(['default1', 'default2'], $result['enum_values']);
+}
+
+public function testProcesarColumnaParserConOpcionesVariadas() {
+    $field = new \stdClass();
+    $field->name = 'col_test';
+    $field->type = (object)[
+        'name' => 'VARCHAR',
+        'parameters' => [10],
+    ];
+    $field->key = (object)['type' => 'PRIMARY KEY'];
+    // Simula opciones de not null y default
+    $field->options = (object)['options' => [
+        'not null' => 'NOT NULL',
+        'auto_increment' => 'AUTO_INCREMENT',
+        'default' => 'valor'
+    ]];
+    $result = $this->invoke('procesarColumnaParser', [$field]);
+    $this->assertTrue($result['es_primary_key']);
+    $this->assertTrue($result['es_auto_increment']);
+    $this->assertTrue($result['es_not_null']);
+    $this->assertEquals('valor', $result['default_value']);
+}
+
+public function testConstruirModificadores() {
+    $result = $this->invoke('construirModificadores', [true, true, true, 'valor']);
+    $this->assertStringContainsString('NOT NULL', $result);
+    $this->assertStringContainsString('AUTO_INCREMENT', $result);
+    $this->assertStringContainsString('PRIMARY KEY', $result);
+    $this->assertStringContainsString("DEFAULT 'valor'", $result);
+}
+
+public function testLimpiarScript() {
+    $script = "-- comentario\nCREATE TABLE test (id INT);\n/* otro */\nSET NAMES utf8;\nUSE mi_db;";
+    $result = $this->invoke('limpiarScript', [$script]);
+    $this->assertStringNotContainsString('--', $result);
+    $this->assertStringNotContainsString('/*', $result);
+    $this->assertStringNotContainsString('SET NAMES', $result);
+    $this->assertStringNotContainsString('USE mi_db', $result);
+    $this->assertStringContainsString('CREATE TABLE', $result);
+}
+
+public function testDeterminarTipoGeneracionPorNombre() {
+    $this->assertEquals('numero_entero', $this->invoke('determinarTipoGeneracion', ['id', 'INT', '', [], false]));
+    $this->assertEquals('nombre_persona', $this->invoke('determinarTipoGeneracion', ['nombre_completo', 'VARCHAR', '', [], false]));
+    $this->assertEquals('email', $this->invoke('determinarTipoGeneracion', ['email_usuario', 'VARCHAR', '', [], false]));
+    $this->assertEquals('telefono', $this->invoke('determinarTipoGeneracion', ['telefono_principal', 'VARCHAR', '', [], false]));
+    $this->assertEquals('direccion', $this->invoke('determinarTipoGeneracion', ['direccion_envio', 'VARCHAR', '', [], false]));
+    $this->assertEquals('fecha', $this->invoke('determinarTipoGeneracion', ['fecha_nacimiento', 'DATE', '', [], false]));
+    $this->assertEquals('numero_decimal', $this->invoke('determinarTipoGeneracion', ['precio_unitario', 'DECIMAL', '', [], false]));
+    $this->assertEquals('auto_increment', $this->invoke('determinarTipoGeneracion', ['id', 'INT', '', [], true]));
+    $this->assertEquals('enum_values', $this->invoke('determinarTipoGeneracion', ['estado', 'ENUM', '', ['A', 'B'], false]));
+    $this->assertEquals('texto_aleatorio', $this->invoke('determinarTipoGeneracion', ['campoX', 'VARCHAR', '', [], false]));
+}
 }
