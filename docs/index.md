@@ -8,7 +8,13 @@
 
 ## Descripción del Sistema
 
-DATAFILLER es un sistema web desarrollado en PHP para la gestión integral de documentos.
+DataFiller es una plataforma web diseñada para automatizar la generación de datos de prueba realistas para bases de datos SQL y NoSQL. Desarrollada en PHP 8.0, permite a desarrolladores y equipos de QA obtener datos sintéticos que respetan la estructura, relaciones y restricciones de integridad de sus bases de datos.
+
+## 📹 Video Demostrativo
+
+[![DataFiller Demo](https://img.youtube.com/vi/SzGoWlZsskU/0.jpg)](https://youtu.be/SzGoWlZsskU)
+
+[Ver demostración completa del sistema](https://youtu.be/SzGoWlZsskU)
 
 ## 📚 Documentación Disponible
 
@@ -32,10 +38,10 @@ DATAFILLER es un sistema web desarrollado en PHP para la gestión integral de do
 
 ### Tecnologías Utilizadas
 - **Backend:** PHP 8.0.30
-- **Base de Datos:** MySQL/MariaDB  
-- **Servidor Web:** Apache (XAMPP)
-- **Frontend:** HTML5, CSS3, JavaScript
-- **Documentación:** DocFX
+- **Base de Datos:** MySQL 8.0
+- **Servidor Web:** Apache 2.4 (XAMPP)
+- **Frontend:** HTML5, CSS3, JavaScript, Bootstrap
+- **Documentación:** DocFX 2.78.3
 - **CI/CD:** GitHub Actions
 
 ### Estructura del Proyecto
@@ -43,17 +49,30 @@ DATAFILLER es un sistema web desarrollado en PHP para la gestión integral de do
 DATAFILLER/
 ├── config/          # Configuración del sistema
 ├── controllers/     # Controladores MVC
-├── models/         # Modelos de datos  
-├── views/          # Vistas y templates
-├── public/         # Archivos públicos
-├── tests/          # Pruebas unitarias
-├── docs/           # Documentación técnica
-└── FD01-EPIS-*.md  # Informes del proyecto
+├── models/          # Modelos de datos  
+├── views/           # Vistas y templates
+├── public/          # Archivos públicos
+├── tests/           # Pruebas unitarias
+├── docs/            # Documentación técnica
+└── .github/         # Workflows de CI/CD
 ```
 
-## Capturas del Sistema
+## Características Principales
 
-![Interfaz Principal](images/main-interface.png)
+### 1. Generación de Datos
+- Análisis automático de scripts SQL
+- Generación de datos respetando relaciones
+- Varios formatos de salida (SQL, CSV, JSON)
+
+### 2. Planes de Usuario
+- Plan gratuito (limitado)
+- Plan premium con funcionalidades avanzadas
+- Gestión de suscripciones integrada
+
+### 3. Implementación Técnica
+- Arquitectura MVC escalable
+- Sistema de logs y trazas integrado
+- Tests automatizados para componentes críticos
 
 ---
 
