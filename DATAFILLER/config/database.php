@@ -5,6 +5,7 @@ namespace App\Config;
 use PDO;
 use PDOException;
 
+
 class Database {
     // Parámetros de la base de datos
     private $host;
