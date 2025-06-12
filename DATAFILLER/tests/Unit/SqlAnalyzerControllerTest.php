@@ -18,7 +18,7 @@ final class SqlAnalyzerControllerTest extends TestCase
 
     protected function setUp(): void
     {
-        // Evitar bloque POST de tu controller
+        // Evitar que el file-scope de tu controlador procese POST
         $_SERVER['REQUEST_METHOD'] = 'GET';
         if (session_status() === PHP_SESSION_ACTIVE) {
             session_unset();
@@ -26,13 +26,11 @@ final class SqlAnalyzerControllerTest extends TestCase
         }
         $_SESSION = [];
 
-        // Creamos instancia SIN invocar __construct (no carga Database)
-        $this->controller = $this->getMockBuilder(SqlAnalyzerController::class)
-                                 ->disableOriginalConstructor()
-                                 ->getMock();
+        // Creamos una instancia limpia
+        $this->controller = new SqlAnalyzerController();
     }
 
-    /**
+    /** 
      * Inyecta por reflexión el mock de Usuario y el mock de PDO
      */
     private function injectDependencies(Usuario $usuarioMock, PDO $dbMock): void
@@ -50,12 +48,13 @@ final class SqlAnalyzerControllerTest extends TestCase
 
     public function testLimiteConsultasAgotadoDevuelveError(): void
     {
-        // Usuario que ya no tiene consultas
+        // Usuario que ya no tiene consultas restantes
         $usuario = $this->createMock(Usuario::class);
         $usuario->method('obtenerConsultasRestantes')
                 ->with($this->usuarioId)
                 ->willReturn(0);
 
+        // PDO stub (no importa qué haga porque no llegamos a registrarConsulta)
         $db = $this->createMock(PDO::class);
 
         $this->injectDependencies($usuario, $db);
@@ -69,13 +68,16 @@ final class SqlAnalyzerControllerTest extends TestCase
 
     public function testSinTablasEnScriptDevuelveSinTablas(): void
     {
+        // Usuario con consultas OK
         $usuario = $this->createMock(Usuario::class);
-        $usuario->method('obtenerConsultasRestantes')->willReturn(1);
+        $usuario->method('obtenerConsultasRestantes')
+                ->willReturn(1);
 
         $db = $this->createMock(PDO::class);
 
         $this->injectDependencies($usuario, $db);
 
+        // Script sin CREATE TABLE
         $result = $this->controller->analizarEstructura('NO HAY TABLAS', $this->dbType, $this->usuarioId);
 
         $this->assertFalse($result['exito']);
@@ -85,12 +87,14 @@ final class SqlAnalyzerControllerTest extends TestCase
 
     public function testEstructuraValidaDevuelveTablas(): void
     {
+        // Usuario con consultas OK y spy en incrementarConsultas()
         $usuario = $this->createMock(Usuario::class);
         $usuario->method('obtenerConsultasRestantes')->willReturn(1);
         $usuario->expects($this->once())
                 ->method('incrementarConsultas')
                 ->with($this->usuarioId);
 
+        // Stub de PDO / PDOStatement para que registrarConsulta no falle
         $db = $this->createMock(PDO::class);
         $stmt = $this->createMock(PDOStatement::class);
         $db->method('prepare')->willReturn($stmt);
@@ -99,7 +103,9 @@ final class SqlAnalyzerControllerTest extends TestCase
 
         $this->injectDependencies($usuario, $db);
 
+        // Script que sí contiene CREATE TABLE => fallback lo detecta
         $script = 'CREATE TABLE users (id INT);';
+
         $result = $this->controller->analizarEstructura($script, $this->dbType, $this->usuarioId);
 
         $this->assertTrue($result['exito']);
