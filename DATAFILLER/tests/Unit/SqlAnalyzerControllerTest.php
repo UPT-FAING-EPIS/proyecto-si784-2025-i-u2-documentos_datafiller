@@ -122,4 +122,66 @@ final class SqlAnalyzerControllerTest extends TestCase
         $this->assertSame('users', $result['tablas'][0]['nombre']);
     }
     
+    public function testDeterminarTipoGeneracionVarious(): void
+    {
+        // auto increment
+        $this->assertSame(
+            'auto_increment',
+            $this->invoke('determinarTipoGeneracion', ['id', 'INT', '', [], true])
+        );
+
+        // enum
+        $this->assertSame(
+            'enum_values',
+            $this->invoke('determinarTipoGeneracion', ['status', 'ENUM', '', ['one','two'], false])
+        );
+
+        // email by name
+        $this->assertSame(
+            'email',
+            $this->invoke('determinarTipoGeneracion', ['user_email', 'VARCHAR', '', [], false])
+        );
+
+        // decimal by type
+        $this->assertSame(
+            'numero_decimal',
+            $this->invoke('determinarTipoGeneracion', ['price', 'DECIMAL', '', [], false])
+        );
+
+        // fallback to texto_aleatorio
+        $this->assertSame(
+            'texto_aleatorio',
+            $this->invoke('determinarTipoGeneracion', ['foo', 'UNKNOWN', '', [], false])
+        );
+    }
+    public function testExtraerTablasFallbackParsesMultipleTables(): void
+    {
+        $sql = <<<'SQL'
+CREATE TABLE users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(20)
+);
+CREATE TABLE orders (
+  order_id INT,
+  user_id INT,
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
+SQL;
+        $tables = $this->invoke('extraerTablasFallback', [$sql]);
+        $this->assertCount(2, $tables);
+
+        $this->assertSame('users', $tables[0]['nombre']);
+        $cols0 = array_column($tables[0]['columnas'], 'nombre');
+        $this->assertContains('id', $cols0);
+        $this->assertContains('name', $cols0);
+
+        $this->assertSame('orders', $tables[1]['nombre']);
+        $fk = array_values(array_filter(
+            $tables[1]['columnas'],
+            fn($c) => $c['nombre'] === 'user_id'
+        ))[0];
+        $this->assertTrue($fk['es_foreign_key']);
+        $this->assertSame('users', $fk['references_table']);
+        $this->assertSame('id', $fk['references_column']);
+    }
 }
