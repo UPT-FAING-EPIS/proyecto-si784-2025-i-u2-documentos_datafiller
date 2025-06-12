@@ -209,4 +209,92 @@ final class SqlAnalyzerControllerTest extends TestCase
         $this->assertEquals('enum_values', $this->invoke('determinarTipoGeneracion', ['estado', 'ENUM', '', ['A', 'B'], false]));
         $this->assertEquals('texto_aleatorio', $this->invoke('determinarTipoGeneracion', ['campoX', 'VARCHAR', '', [], false]));
     }
+    public function testAnalizarTablaConParserProcesaColumnasYForeignKey() {
+        // Mock de campo normal
+        $col = $this->getMockBuilder(\stdClass::class)->getMock();
+        $col->name = 'id';
+        $col->type = (object)['name' => 'INT', 'parameters' => [11]];
+        $col->options = (object)['options' => []];
+        $col->key = (object)['type' => 'PRIMARY KEY'];
+
+        // Mock de campo foreign key
+        $fk = $this->getMockBuilder(\stdClass::class)->getMock();
+        $fk->name = 'cliente_id';
+        $fk->type = (object)['name' => 'INT', 'parameters' => [11]];
+        $fk->options = (object)['options' => []];
+        $fk->key = (object)['type' => 'FOREIGN KEY'];
+        $fk->references = (object)[
+            'table' => 'clientes',
+            'columns' => ['id']
+        ];
+
+        // Statement simulado
+        $stmt = $this->getMockBuilder(\stdClass::class)->getMock();
+        $stmt->name = (object)['table' => 'facturas'];
+        $stmt->fields = [$col, $fk];
+        $stmt->build = function() { return 'CREATE TABLE facturas...'; }; // Closure para simular build()
+
+        // Sobreescribe build() para el mock
+        $reflection = new \ReflectionClass($stmt);
+        $property = $reflection->getProperty('build');
+        $property->setAccessible(true);
+        $property->setValue($stmt, function() { return 'CREATE TABLE facturas...'; });
+
+        $result = $this->invoke('analizarTablaConParser', [$stmt]);
+        $this->assertIsArray($result);
+        $this->assertEquals('facturas', $result['nombre']);
+        $this->assertCount(2, $result['columnas']);
+        $this->assertTrue($result['columnas'][1]['es_foreign_key']);
+        $this->assertEquals('clientes', $result['columnas'][1]['references_table']);
+        $this->assertEquals('id', $result['columnas'][1]['references_column']);
+    }
+    public function testExtraerColumnasFallbackMejoradoCubreTodosLosCasos() {
+        $definicion = "
+            `id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            `nombre` VARCHAR(100) NOT NULL,
+            `estado` ENUM('A','B') DEFAULT 'A',
+            `precio` DECIMAL(10,2) DEFAULT 0.0,
+            CONSTRAINT fk_cliente FOREIGN KEY (`id`) REFERENCES clientes(`id`)
+        ";
+        $result = $this->invoke('extraerColumnasFallbackMejorado', [$definicion]);
+        $this->assertCount(4, $result);
+        $this->assertTrue($result[0]['es_primary_key']);
+        $this->assertTrue($result[0]['es_auto_increment']);
+        $this->assertTrue($result[0]['es_not_null']);
+        $this->assertEquals('A', $result[2]['enum_values'][0]);
+        $this->assertEquals('A', $result[2]['default_value']);
+        $this->assertEquals('numero_decimal', $result[3]['tipo_generacion']);
+        $this->assertTrue($result[0]['es_foreign_key']); // Por la FK aplicada
+        $this->assertEquals('clientes', $result[0]['references_table']);
+    }
+    public function testDividirPorComasSegurasConCasosComplejos() {
+        // Caso simple
+        $input1 = "id INT, nombre VARCHAR(100), edad INT";
+        $result1 = $this->invoke('dividirPorComasSeguras', [$input1]);
+        $this->assertCount(3, $result1);
+
+        // Caso con comas en ENUM y paréntesis
+        $input2 = "`estado` ENUM('A','B','C'), `info` VARCHAR(20)";
+        $result2 = $this->invoke('dividirPorComasSeguras', [$input2]);
+        $this->assertCount(2, $result2);
+
+        // Caso con comillas dobles y paréntesis
+        $input3 = "`descripcion` VARCHAR(255), `json` TEXT, `etiqueta` VARCHAR(10)";
+        $result3 = $this->invoke('dividirPorComasSeguras', [$input3]);
+        $this->assertCount(3, $result3);
+    }
+    public function testDeterminarTipoGeneracionSwitches() {
+        $this->assertEquals('texto_aleatorio', $this->invoke('determinarTipoGeneracion', ['campo', 'VARCHAR', '', [], false]));
+        $this->assertEquals('numero_entero', $this->invoke('determinarTipoGeneracion', ['campo', 'BIGINT', '', [], false]));
+        $this->assertEquals('numero_decimal', $this->invoke('determinarTipoGeneracion', ['campo', 'DOUBLE', '', [], false]));
+        $this->assertEquals('fecha', $this->invoke('determinarTipoGeneracion', ['campo', 'DATE', '', [], false]));
+        $this->assertEquals('fecha_hora', $this->invoke('determinarTipoGeneracion', ['campo', 'TIMESTAMP', '', [], false]));
+        $this->assertEquals('booleano', $this->invoke('determinarTipoGeneracion', ['campo', 'BOOL', '', [], false]));
+    }
+    public function testAnalizarTablaConParserCatch() {
+        $stmt = $this->getMockBuilder(\stdClass::class)->getMock();
+        // No tiene propiedad name, lanzará excepción
+        $result = $this->invoke('analizarTablaConParser', [$stmt]);
+        $this->assertNull($result);
+    }
 }
