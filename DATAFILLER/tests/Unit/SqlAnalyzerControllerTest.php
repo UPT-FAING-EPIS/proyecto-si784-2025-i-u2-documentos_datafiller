@@ -3,6 +3,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit;
 
+if (!class_exists('\PhpMyAdmin\SqlParser\Components\CreateDefinition')) {
+    eval('namespace PhpMyAdmin\SqlParser\Components; class CreateDefinition {}');
+}
+
 use PHPUnit\Framework\TestCase;
 use App\Controllers\SqlAnalyzerController;
 use App\Models\Usuario;
