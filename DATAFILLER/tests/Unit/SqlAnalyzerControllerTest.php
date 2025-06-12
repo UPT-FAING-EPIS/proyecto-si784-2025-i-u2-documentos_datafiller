@@ -54,6 +54,13 @@ final class SqlAnalyzerControllerTest extends TestCase
         $p2->setValue($this->controller, $dbMock);
     }
 
+    private function invoke(string $methodName, array $args = [])
+    {
+        $method = $this->ref->getMethod($methodName);
+        $method->setAccessible(true);
+        return $method->invokeArgs($this->controller, $args);
+    }
+    
     public function testLimiteConsultasAgotadoDevuelveError(): void
     {
         // Usuario que ya no tiene consultas restantes
