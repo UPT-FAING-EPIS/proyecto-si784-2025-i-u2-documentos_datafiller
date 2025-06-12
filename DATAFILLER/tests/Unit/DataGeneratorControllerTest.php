@@ -45,17 +45,19 @@ final class DataGeneratorControllerTest extends TestCase
 
         $_SESSION['usuario'] = ['id' => 1];
         
-        // Mock de Usuario
+        // Crear un mock para la clase Usuario
         $usuarioMock = $this->getMockBuilder(Usuario::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['obtenerInfoUsuario'])
             ->getMock();
+
+        // Configurar el mock para devolver un array válido en lugar de false
         $usuarioMock->method('obtenerInfoUsuario')->willReturn([
             'id' => 1,
             'plan' => 'premium'
         ]);
 
-        // Crea una instancia del controlador pasando el mock como dependencia
+        // Crear una instancia del controlador pasándole el mock correctamente
         $controller = new DataGeneratorController('es_ES', $usuarioMock);
 
         $result = $controller->generarDatos($config, 1);
