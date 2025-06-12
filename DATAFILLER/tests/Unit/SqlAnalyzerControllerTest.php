@@ -211,7 +211,7 @@ final class SqlAnalyzerControllerTest extends TestCase
         $fk = new \stdClass();
         $fk->name = 'cliente_id';
         $fk->type = (object)['name' => 'INT', 'parameters' => [11]];
-        $fk->options = (object)['options' => [];
+        $fk->options = (object)['options' => []];
         $fk->key = (object)['type' => 'FOREIGN KEY'];
         $fk->references = (object)[
             'table' => 'clientes',
