@@ -445,4 +445,3 @@ final class UsuarioTest extends TestCase
         $this->assertSame(3, $spy3->calcularConsultasRestantes(17));
     }
 }
-}
