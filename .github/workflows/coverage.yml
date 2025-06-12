@@ -17,7 +17,7 @@ jobs:
       - name: Setup PHP & Xdebug
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2'
+          php-version: '8.1'
           coverage: xdebug
 
       - name: Install dependencies
@@ -30,7 +30,8 @@ jobs:
           vendor/bin/phpunit -c phpunit.xml --coverage-html coverage-report
 
       - name: Upload coverage-report as artifact
-        uses: actions/upload-artifact@v3
+        # Actualiza a la versión soportada @v4 para evitar el error deprecado
+        uses: actions/upload-artifact@v4
         with:
           name: coverage-report
           path: DATAFILLER/coverage-report
