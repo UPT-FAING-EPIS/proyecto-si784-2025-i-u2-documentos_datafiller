@@ -57,6 +57,15 @@ final class DataGeneratorControllerTest extends TestCase
         $_SESSION['usuario'] = ['id' => 1];
         $controller = new DataGeneratorController('es_ES');
 
+        // Mock para Usuario
+        $usuarioMock = $this->getMockBuilder(\App\Models\Usuario::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['obtenerInfoUsuario'])
+            ->getMock();
+        $usuarioMock->method('obtenerInfoUsuario')->willReturn([
+            'id' => 1,
+            'plan' => 'premium'
+        ]);
         // Crear tabla auditoría en el PDO stub antes de llamar a generarDatos
         $pdo = $this->getPrivatePdo($controller);
         $pdo->exec("
