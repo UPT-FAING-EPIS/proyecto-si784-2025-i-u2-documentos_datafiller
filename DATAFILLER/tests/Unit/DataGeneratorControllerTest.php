@@ -6,7 +6,6 @@ namespace App\Tests\Unit;
 use PHPUnit\Framework\TestCase;
 use App\Controllers\DataGeneratorController;
 
-// Puedes dejar SOLO el autoload para DatabaseStub si lo necesitas
 spl_autoload_register(function ($class) {
     if ($class === 'App\Config\Database') {
         require __DIR__ . '/Stubs/DatabaseStub.php';
@@ -24,13 +23,12 @@ final class DataGeneratorControllerTest extends TestCase
         }
         $_SESSION = [];
         $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
-        $_SERVER['REQUEST_METHOD'] = 'CLI'; // Previene ejecución automática del controlador
+        $_SERVER['REQUEST_METHOD'] = 'CLI';
         $_POST['formato_salida'] = 'sql';
     }
 
     public function testGenerarDatosBasico(): void
     {
-        // Configuración simple: 1 tabla, 1 columna
         $config = [
             'formato_salida' => 'sql',
             'idioma_datos' => 'es_ES',
@@ -57,7 +55,7 @@ final class DataGeneratorControllerTest extends TestCase
         $_SESSION['usuario'] = ['id' => 1];
         $controller = new DataGeneratorController('es_ES');
 
-        // Mock para Usuario
+        // Mock de Usuario SOLO para este test
         $usuarioMock = $this->getMockBuilder(\App\Models\Usuario::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['obtenerInfoUsuario'])
@@ -66,7 +64,17 @@ final class DataGeneratorControllerTest extends TestCase
             'id' => 1,
             'plan' => 'premium'
         ]);
-        // Crear tabla auditoría en el PDO stub antes de llamar a generarDatos
+        // Inyecta el mock en el controlador antes de llamar a generarDatos
+        $refCtrl = new \ReflectionClass($controller);
+        if ($refCtrl->hasProperty('usuario')) {
+            $propUsuario = $refCtrl->getProperty('usuario');
+            $propUsuario->setAccessible(true);
+            $propUsuario->setValue($controller, $usuarioMock);
+        } else {
+            // Si tu controlador usa otro nombre para la propiedad del modelo Usuario, cámbialo aquí
+            $this->fail('No se encontró property usuario en DataGeneratorController');
+        }
+
         $pdo = $this->getPrivatePdo($controller);
         $pdo->exec("
             CREATE TABLE tbauditoria_consultas (
