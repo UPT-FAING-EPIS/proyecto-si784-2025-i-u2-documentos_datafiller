@@ -69,6 +69,20 @@ final class DataGeneratorControllerTest extends TestCase
 
         $_SESSION['usuario'] = ['id' => 1];
         $controller = new DataGeneratorController('es_ES');
+
+        // ----- CREA LA TABLA tbauditoria_consultas -----
+        $pdo = $this->getPrivatePdo($controller);
+        $pdo->exec("
+            CREATE TABLE tbauditoria_consultas (
+                usuario_id INTEGER,
+                tipo_consulta TEXT,
+                cantidad_registros INTEGER,
+                formato_exportacion TEXT,
+                fecha_consulta TEXT DEFAULT (CURRENT_TIMESTAMP),
+                ip_usuario TEXT
+            )
+        ");
+
         $result = $controller->generarDatos($config, 1);
 
         $this->assertTrue($result['exito']);
@@ -76,5 +90,16 @@ final class DataGeneratorControllerTest extends TestCase
         $this->assertIsArray($result['estadisticas']);
         $this->assertArrayHasKey('contenido', $result);
         $this->assertStringContainsString('INSERT INTO `usuarios`', $result['contenido']);
+    }
+
+    /**
+     * Helper para obtener el PDO real desde el controlador (igual que en AnalyticsControllerTest)
+     */
+    private function getPrivatePdo($controller): \PDO
+    {
+        $ref = new \ReflectionClass($controller);
+        $prop = $ref->getProperty('db');
+        $prop->setAccessible(true);
+        return $prop->getValue($controller);
     }
 }
