@@ -38,6 +38,8 @@ final class SqlAnalyzerControllerTest extends TestCase
         // Creamos una instancia limpia; al instanciar, el controlador
         // hará new Database() pero cargará nuestro stub SQLite in‐memory.
         $this->controller = new SqlAnalyzerController();
+        $this->ref = new ReflectionClass(SqlAnalyzerController::class); // <- Initialize ReflectionClass
+
     }
 
     /** 
