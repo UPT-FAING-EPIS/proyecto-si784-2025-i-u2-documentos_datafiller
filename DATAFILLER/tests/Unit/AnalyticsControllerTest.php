@@ -7,12 +7,14 @@ use PHPUnit\Framework\TestCase;
 use App\Controllers\AnalyticsController;
 use PDO;
 
-// Intercepta App\Config\Database para usar el stub si el controlador lo pide
+// Intercepta App\Config\Database para usar el stub solo en este test
 spl_autoload_register(function (string $class) {
     if ($class === 'App\Config\Database') {
         require __DIR__ . '/Stubs/DatabaseNowStub.php';
+        return true;
     }
-}, /* prepend */ true, /* throw */ true);
+    return false;
+}, true, true);
 
 final class AnalyticsControllerTest extends TestCase
 {
@@ -43,15 +45,15 @@ final class AnalyticsControllerTest extends TestCase
         // Crea la tabla simulada en memoria
         $pdo = $this->getPrivatePdo($controller);
         $pdo->exec("
-    CREATE TABLE tbauditoria_consultas (
-        usuario_id INTEGER,
-        tipo_consulta TEXT,
-        cantidad_registros INTEGER,
-        formato_exportacion TEXT,
-        fecha_consulta TEXT DEFAULT (CURRENT_TIMESTAMP),
-        ip_usuario TEXT
-    )
-");
+            CREATE TABLE tbauditoria_consultas (
+                usuario_id INTEGER,
+                tipo_consulta TEXT,
+                cantidad_registros INTEGER,
+                formato_exportacion TEXT,
+                fecha_consulta TEXT DEFAULT (CURRENT_TIMESTAMP),
+                ip_usuario TEXT
+            )
+        ");
 
         $result = $controller->registrarDescarga('xlsx', 5);
 

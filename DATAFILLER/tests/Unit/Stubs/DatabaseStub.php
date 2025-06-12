@@ -1,16 +1,12 @@
 <?php
 namespace App\Config;
 
-use PDO;
+use App\Tests\Unit\Stubs\PdoNowStub;
 
 class Database
 {
-    /**
-     * Devuelve siempre un PDO SQLite en memoria para los tests,
-     * evitando cualquier conexión real.
-     */
-    public function getConnection(...$args): PDO
+    public function getConnection(...$args)
     {
-        return new PDO('sqlite::memory:');
+        return new PdoNowStub();
     }
 }
