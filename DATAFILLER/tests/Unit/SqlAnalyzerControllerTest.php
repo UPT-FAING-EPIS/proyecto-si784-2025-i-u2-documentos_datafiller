@@ -10,6 +10,13 @@ use ReflectionClass;
 use PDO;
 use PDOStatement;
 
+// Intercept App\Config\Database para cargar el stub en lugar de la clase real
+spl_autoload_register(function (string $class) {
+    if ($class === 'App\Config\Database') {
+        require __DIR__ . '/Stubs/DatabaseStub.php';
+    }
+}, /* prepend */ true, /* throw */ true);
+
 final class SqlAnalyzerControllerTest extends TestCase
 {
     private int $usuarioId = 42;
@@ -26,7 +33,8 @@ final class SqlAnalyzerControllerTest extends TestCase
         }
         $_SESSION = [];
 
-        // Creamos una instancia limpia
+        // Creamos una instancia limpia; al instanciar, el controlador
+        // hará new Database() pero cargará nuestro stub SQLite in‐memory.
         $this->controller = new SqlAnalyzerController();
     }
 
