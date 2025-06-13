@@ -29,7 +29,7 @@ class LoginController {
         $resultado = $this->usuarioModel->validarLogin($nombre, $password);
         
         if($resultado['exito']) {
-            // Iniciar sesión con toda la información necesaria INCLUYENDO EL ID
+            // Solo asignar a la sesión (ya está iniciada en login.php)
             $_SESSION['usuario'] = [
                 'id' => $resultado['usuario']['id'],
                 'nombre' => $resultado['usuario']['nombre'],
