@@ -25,6 +25,7 @@ DataFiller es una plataforma web diseñada para automatizar la generación de da
 - [📄 FD04 - Informe de SAD](informes/fd04-informe-sad.md)
 - [📄 FD05 - Informe de Proyecto Final](informes/fd05-informe-final.md)
 - [📄 FD   - DICCIONARIO DE DATOS](informes/DICCIONARIO_DE_DATOS.md)
+- [📄 Diapo   - Markdown](informes/markdown.md)
 
 
 ### Manuales Técnicos
