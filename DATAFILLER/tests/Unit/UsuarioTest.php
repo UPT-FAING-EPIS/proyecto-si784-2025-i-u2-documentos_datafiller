@@ -599,6 +599,12 @@ final class UsuarioTest extends TestCase
         $this->assertTrue($usuario->incrementarConsultas(42));
     }
 
+    public function testIncrementarConsultasCatchException(): void
+    {
+        $this->dbMock->method('prepare')->will($this->throwException(new \PDOException('DB error')));
+        $usuario = new Usuario($this->dbMock);
+        $this->assertFalse($usuario->incrementarConsultas(99));
+    }
 
     public function testIncrementarConsultasSinRegistros(): void
     {
