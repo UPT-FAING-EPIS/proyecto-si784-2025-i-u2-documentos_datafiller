@@ -9,7 +9,7 @@ class LoginController {
     // Permite inyectar el modelo para facilitar tests
     public function __construct($db, $usuarioModel = null) {
         $this->usuarioModel = $usuarioModel ?: new Usuario($db);
-    }
+    }   
 
     protected function setUp(): void
     {
