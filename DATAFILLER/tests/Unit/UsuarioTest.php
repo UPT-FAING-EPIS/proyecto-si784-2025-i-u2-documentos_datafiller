@@ -261,6 +261,17 @@ final class UsuarioTest extends TestCase
         $usuario = new Usuario($this->dbMock);
         $this->assertTrue($usuario->puedeRealizarConsulta(2));
     }
+    public function testResetearConsultasDiarias(): void
+{
+    $this->stmtUpdateMock->method('execute')->willReturn(true);
+
+    $usuario = new Usuario($this->dbMock);
+    // Usa Reflection si el método es privado
+    $method = new \ReflectionMethod($usuario, 'resetearConsultasDiarias');
+    $method->setAccessible(true);
+
+    $this->assertTrue($method->invoke($usuario, 10));
+}
 
     public function testPuedeRealizarConsultaMismoDiaMenosLimite(): void
     {
