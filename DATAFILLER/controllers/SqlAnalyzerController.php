@@ -1,5 +1,17 @@
 <?php
 namespace App\Controllers;
+
+// ✅ AUTOLOAD PRIMERO
+require_once __DIR__ . '/../vendor/autoload.php';
+
+use App\Config\Database;
+use App\Models\Usuario;
+use App\Controllers\FileProcessorController;
+use PhpMyAdmin\SqlParser\Parser;
+use PhpMyAdmin\SqlParser\Components\CreateDefinition;
+use PhpMyAdmin\SqlParser\Statements\CreateStatement;
+
+// ✅ CREAR DIRECTORIO DE LOGS
 if(!file_exists(__DIR__ . '/../logs')) {
     mkdir(__DIR__ . '/../logs', 0777, true);
 }
@@ -9,16 +21,6 @@ function debug_log($message) {
     $timestamp = date('Y-m-d H:i:s');
     file_put_contents(__DIR__ . '/../logs/debug.log', "[$timestamp] $message\n", FILE_APPEND);
 }
-
-// Usa autoload de Composer y namespaces modernos
-require_once __DIR__ . '/../vendor/autoload.php';
-
-use App\Config\Database;
-use App\Models\Usuario;
-use App\Controllers\FileProcessorController;
-use PhpMyAdmin\SqlParser\Parser;
-use PhpMyAdmin\SqlParser\Components\CreateDefinition;
-use PhpMyAdmin\SqlParser\Statements\CreateStatement;
 
 class SqlAnalyzerController {
     private $db;
@@ -595,14 +597,27 @@ class SqlAnalyzerController {
         }
     }
 }
-// Procesar la solicitud
+
+// ✅ MOVER EL CÓDIGO POST AQUÍ - DESPUÉS DE LA CLASE
 if($_SERVER['REQUEST_METHOD'] === 'POST') {
-    session_start();
+    // Iniciar sesión
+    if(session_status() !== PHP_SESSION_ACTIVE) {
+        session_start();
+    }
+    
+    debug_log("=== INICIO PROCESAMIENTO POST ===");
+    debug_log("Session ID: " . session_id());
+    debug_log("Usuario en sesión: " . (isset($_SESSION['usuario']) ? 'SÍ - ID: ' . $_SESSION['usuario']['id'] : 'NO'));
+    
+    // Verificar sesión
     if(!isset($_SESSION['usuario'])) {
+        debug_log("❌ Usuario no autenticado, redirigiendo");
         $_SESSION['error'] = 'Debe iniciar sesión para usar esta funcionalidad.';
         header('Location: ../views/Auth/login.php');
         exit();
     }
+    
+    debug_log("✅ Usuario autenticado: " . $_SESSION['usuario']['nombre']);
     
     $script = $_POST['script'] ?? '';
     $dbType = $_POST['dbType'] ?? 'sql';

@@ -1,5 +1,19 @@
 <?php
-session_start();
+if(session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+
+// ✅ PROTECCIÓN: Verificar autenticación en páginas de usuario
+$pagina_actual = basename($_SERVER['PHP_SELF']);
+$carpeta_actual = basename(dirname($_SERVER['PHP_SELF']));
+
+// Si estamos en carpeta User, verificar que esté logueado
+if($carpeta_actual === 'User') {
+    if(!isset($_SESSION['usuario'])) {
+        header('Location: ../Auth/login.php');
+        exit();
+    }
+}
 
 require_once __DIR__ . '/../../vendor/autoload.php'; // Autoload de Composer
 
