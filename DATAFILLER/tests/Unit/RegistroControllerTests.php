@@ -10,18 +10,14 @@ class RegistroControllerTest extends TestCase
     private $mockDb;
     private $mockUsuarioModel;
 
-    protected $usuarioModel; 
-
-
-    public function __construct($db) {
-        $this->usuarioModel = new Usuario($db);
-    }
     protected function setUp(): void
     {
-
         $this->mockDb = $this->createMock(PDO::class);
         $this->mockUsuarioModel = $this->createMock(Usuario::class);
         $this->registroController = new RegistroController($this->mockDb);
+
+        // Inyecta el modelo de usuario simulado
+        $this->registroController->setUsuarioModel($this->mockUsuarioModel);
     }
 
     public function testRegistrarDatosIncompletos()
@@ -75,7 +71,6 @@ class RegistroControllerTest extends TestCase
         $this->assertEquals('Las contraseñas no coinciden.', $resultado['mensaje']);
     }
 
-    // Agrega más pruebas para cada caso del método.
     public function testPasswordTooShort()
     {
         $datos = [
