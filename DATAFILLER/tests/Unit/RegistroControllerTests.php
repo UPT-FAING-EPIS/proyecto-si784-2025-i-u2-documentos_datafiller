@@ -1,102 +1,70 @@
 <?php
-namespace App\Controllers;
 
+use PHPUnit\Framework\TestCase;
+use App\Controllers\RegistroController;
 use App\Models\Usuario;
 
-class RegistroController {
-    private $usuarioModel;
+class RegistroControllerTest extends TestCase
+{
+    private $registroController;
+    private $mockDb;
 
-    public function __construct($db) {
-        $this->usuarioModel = new Usuario($db);
+    protected function setUp(): void
+    {
+        $this->mockDb = $this->createMock(PDO::class);
+        $this->registroController = new RegistroController($this->mockDb);
     }
 
-    // Método para configurar el modelo de usuario, usado en las pruebas
-    public function setUsuarioModel($usuarioModel) {
-        $this->usuarioModel = $usuarioModel;
+    public function testRegistrarDatosIncompletos()
+    {
+        $datos = [
+            'nombre' => '',
+            'apellido_paterno' => '',
+            'apellido_materno' => '',
+            'email' => '',
+            'password' => '',
+            'confirm_password' => ''
+        ];
+
+        $resultado = $this->registroController->registrar($datos);
+
+        $this->assertFalse($resultado['exito']);
+        $this->assertEquals('Por favor complete todos los campos requeridos.', $resultado['mensaje']);
     }
 
-    public function registrar($datos) {
-        // Validar datos
-        if (empty($datos['nombre']) || empty($datos['apellido_paterno']) ||
-            empty($datos['apellido_materno']) || empty($datos['email']) ||
-            empty($datos['password']) || empty($datos['confirm_password'])) {
-            return [
-                'exito' => false,
-                'mensaje' => 'Por favor complete todos los campos requeridos.'
-            ];
-        }
+    public function testRegistrarEmailInvalido()
+    {
+        $datos = [
+            'nombre' => 'Juan',
+            'apellido_paterno' => 'Pérez',
+            'apellido_materno' => 'Gómez',
+            'email' => 'email_invalido',
+            'password' => 'contraseña123',
+            'confirm_password' => 'contraseña123'
+        ];
 
-        // Verificar formato de email
-        if (!filter_var($datos['email'], FILTER_VALIDATE_EMAIL)) {
-            return [
-                'exito' => false,
-                'mensaje' => 'Por favor ingrese un email válido.'
-            ];
-        }
+        $resultado = $this->registroController->registrar($datos);
 
-        // Verificar que las contraseñas coincidan
-        if ($datos['password'] !== $datos['confirm_password']) {
-            return [
-                'exito' => false,
-                'mensaje' => 'Las contraseñas no coinciden.'
-            ];
-        }
-
-        // Verificar longitud de contraseña
-        if (strlen($datos['password']) < 6) {
-            return [
-                'exito' => false,
-                'mensaje' => 'La contraseña debe tener al menos 6 caracteres.'
-            ];
-        }
-
-        // Verificar si el usuario ya existe
-        $usuarioExistente = $this->usuarioModel->buscarPorNombre(strtolower($datos['nombre']));
-        if ($usuarioExistente) {
-            return [
-                'exito' => false,
-                'mensaje' => 'El nombre de usuario ya está registrado. Elija otro nombre.'
-            ];
-        }
-
-        // Verificar si el email ya existe
-        $emailExistente = $this->usuarioModel->buscarPorEmail(strtolower($datos['email']));
-        if ($emailExistente) {
-            return [
-                'exito' => false,
-                'mensaje' => 'Este email ya está registrado. Solo se permite una cuenta por email.'
-            ];
-        }
-
-        // Asignar valores al modelo
-        $this->usuarioModel->nombre = $datos['nombre'];
-        $this->usuarioModel->apellido_paterno = $datos['apellido_paterno'];
-        $this->usuarioModel->apellido_materno = $datos['apellido_materno'];
-        $this->usuarioModel->email = $datos['email'];
-        $this->usuarioModel->password = $datos['password'];
-
-        // Crear usuario
-        if ($this->usuarioModel->crear()) {
-            // Iniciar sesión para el usuario
-            if (session_status() !== PHP_SESSION_ACTIVE) {
-                session_start();
-            }
-            $_SESSION['usuario'] = [
-                'id' => $this->usuarioModel->id,
-                'nombre' => $datos['nombre'],
-                'apellido_paterno' => $datos['apellido_paterno'],
-                'email' => $datos['email']
-            ];
-
-            return [
-                'exito' => true,
-                'mensaje' => 'Registro exitoso. Redirigiendo a promoción de planes...'
-            ];
-        } else {
-            return [
-                'exito' => false,
-                'mensaje' => 'No se pudo completar el registro. Por favor intente nuevamente.'
-            ];
-        }
+        $this->assertFalse($resultado['exito']);
+        $this->assertEquals('Por favor ingrese un email válido.', $resultado['mensaje']);
     }
+
+    public function testRegistrarContraseñasNoCoinciden()
+    {
+        $datos = [
+            'nombre' => 'Juan',
+            'apellido_paterno' => 'Pérez',
+            'apellido_materno' => 'Gómez',
+            'email' => 'juan.perez@example.com',
+            'password' => 'contraseña123',
+            'confirm_password' => 'otraContraseña'
+        ];
+
+        $resultado = $this->registroController->registrar($datos);
+
+        $this->assertFalse($resultado['exito']);
+        $this->assertEquals('Las contraseñas no coinciden.', $resultado['mensaje']);
+    }
+
+    // Agrega más pruebas para cada caso del método.
 }
