@@ -220,6 +220,14 @@ final class UsuarioTest extends TestCase
         $this->assertFalse($fail['exito']);
     }
 
+    
+
+    public function testPuedeRealizarConsultaCatchException(): void
+    {
+        $this->dbMock->method('prepare')->will($this->throwException(new \PDOException('DB error')));
+        $usuario = new Usuario($this->dbMock);
+        $this->assertFalse($usuario->puedeRealizarConsulta(6));
+    }
     public function testPuedeRealizarConsultaPremium(): void
     {
         $this->stmtMock
