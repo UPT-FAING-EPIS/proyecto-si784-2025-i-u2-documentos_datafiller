@@ -604,4 +604,32 @@ final class UsuarioTest extends TestCase
         $this->assertFalse($usuario->incrementarConsultas(99));
     }
     
+    public function testValidarLoginDevuelveFalsoSiNoExisteUsuario(): void
+    {
+        $spy = $this->getMockBuilder(Usuario::class)
+            ->setConstructorArgs([$this->dbMock])
+            ->onlyMethods(['buscarPorNombre'])
+            ->getMock();
+
+        $spy->method('buscarPorNombre')
+            ->with('noexiste')
+            ->willReturn(null);
+
+        $fail = $spy->validarLogin('noexiste', 'cualquier');
+        $this->assertFalse($fail['exito']);
+    }
+
+    public function testValidarLoginCachaExcepcionYDevuelveFalso(): void
+    {
+        $spy = $this->getMockBuilder(Usuario::class)
+            ->setConstructorArgs([$this->dbMock])
+            ->onlyMethods(['buscarPorNombre'])
+            ->getMock();
+
+        $spy->method('buscarPorNombre')
+            ->will($this->throwException(new \PDOException('DB error')));
+
+        $fail = $spy->validarLogin('error', 'clave');
+        $this->assertFalse($fail['exito']);
+    }
 }
