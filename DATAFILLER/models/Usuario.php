@@ -490,7 +490,7 @@ class Usuario {
             return false;
         }
     }
-/*
+
     // Agregar este método que falta
     public function calcularConsultasRestantes($usuario_id) {
         try {
@@ -514,6 +514,6 @@ class Usuario {
             error_log("Error calculando consultas restantes: " . $e->getMessage());
             return 0;
         }
-    }*/
+    }
 }
 ?>
