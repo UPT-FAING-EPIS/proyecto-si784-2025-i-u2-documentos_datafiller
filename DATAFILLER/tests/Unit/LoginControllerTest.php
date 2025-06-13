@@ -1,14 +1,15 @@
 <?php
-namespace Tests\Controllers;
+namespace App\Controllers;
 
-use PHPUnit\Framework\TestCase;
-use App\Controllers\LoginController;
 use App\Models\Usuario;
 
-class LoginControllerTest extends TestCase
-{
-    private $mockUsuario;
-    private $loginController;
+class LoginController {
+    private $usuarioModel;
+
+    // Permite inyectar el modelo para facilitar tests
+    public function __construct($db, $usuarioModel = null) {
+        $this->usuarioModel = $usuarioModel ?: new Usuario($db);
+    }
 
     protected function setUp(): void
     {
