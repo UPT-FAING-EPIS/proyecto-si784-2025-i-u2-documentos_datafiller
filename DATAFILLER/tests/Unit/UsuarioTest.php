@@ -247,31 +247,20 @@ final class UsuarioTest extends TestCase
 
     public function testPuedeRealizarConsultaNuevoDia(): void
     {
-        $this->stmtMock
-            ->method('rowCount')
-            ->willReturn(1);
-        $this->stmtMock
-            ->method('fetch')
-            ->willReturn([
-                'tipo_plan' => 'gratuito',
-                'consultas_diarias' => 3,
-                'fecha_ultima_consulta' => '2000-01-01'
-            ]);
+        // Configura el SELECT
+        $this->stmtSelectMock->method('rowCount')->willReturn(1);
+        $this->stmtSelectMock->method('fetch')->willReturn([
+            'tipo_plan' => 'gratuito',
+            'consultas_diarias' => 3,
+            'fecha_ultima_consulta' => '2000-01-01'
+        ]);
+        // Configura el UPDATE de resetearConsultasDiarias
+        $this->stmtUpdateMock->method('execute')->willReturn(true);
 
         $usuario = new Usuario($this->dbMock);
         $this->assertTrue($usuario->puedeRealizarConsulta(2));
     }
-    public function testResetearConsultasDiarias(): void
-{
-    $this->stmtUpdateMock->method('execute')->willReturn(true);
-
-    $usuario = new Usuario($this->dbMock);
-    // Usa Reflection si el método es privado
-    $method = new \ReflectionMethod($usuario, 'resetearConsultasDiarias');
-    $method->setAccessible(true);
-
-    $this->assertTrue($method->invoke($usuario, 10));
-}
+    
 
     public function testPuedeRealizarConsultaMismoDiaMenosLimite(): void
     {
