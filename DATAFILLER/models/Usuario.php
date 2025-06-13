@@ -291,7 +291,7 @@ class Usuario {
     }
 
     // Función auxiliar para obtener el plan del usuario
-    
+    /*
     public function obtenerPlanUsuario($usuario_id) {
         try {
             $query = "SELECT tipo_plan FROM " . $this->table . " WHERE id = :id LIMIT 1";
@@ -309,7 +309,7 @@ class Usuario {
             return 'gratuito';
         }
     }
-    
+    */
     // Función auxiliar para obtener consultas restantes
     public function obtenerConsultasRestantes($usuario_id) {
         try {
@@ -351,7 +351,7 @@ class Usuario {
             return false;
         }
     }
-    
+    /*
     // Función para obtener estadísticas del usuario
     public function obtenerEstadisticasUsuario($usuario_id) {
         try {
@@ -387,7 +387,7 @@ class Usuario {
             ];
         }
     }
-
+*/
     // Función para validar si el usuario existe
     public function existeUsuario($usuario_id) {
         try {
@@ -490,7 +490,7 @@ class Usuario {
             return false;
         }
     }
-
+/*
     // Agregar este método que falta
     public function calcularConsultasRestantes($usuario_id) {
         try {
@@ -514,6 +514,6 @@ class Usuario {
             error_log("Error calculando consultas restantes: " . $e->getMessage());
             return 0;
         }
-    }
+    }*/
 }
 ?>
