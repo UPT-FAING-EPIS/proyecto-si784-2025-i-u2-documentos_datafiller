@@ -35,4 +35,9 @@ final class DataGeneratorControllerTest extends TestCase
         // Crear una instancia del controlador pasándole el mock
         $this->controller = new DataGeneratorController('es_ES', $this->usuarioMock);
     }
+
+    public function testControllerSeCreaCorrectamente(): void
+    {
+        $this->assertInstanceOf(DataGeneratorController::class, $this->controller);
+    }
 }

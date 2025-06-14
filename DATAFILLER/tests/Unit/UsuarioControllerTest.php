@@ -1,8 +1,14 @@
 <?php
 
+namespace App\Tests\Unit;
+
 use PHPUnit\Framework\TestCase;
 use App\Controllers\UsuarioController;
 use App\Models\Usuario;
+
+use \stdClass;
+use ReflectionClass; // ← Agrega esto también si usas Reflection
+
 
 class UsuarioControllerTest extends TestCase
 {

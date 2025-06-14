@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit 
+<phpunit
     bootstrap="vendor/autoload.php"
     colors="true"
-    verbose="true"
+    executionOrder="random"
+    resolveDependencies="true"
 >
     <testsuites>
         <testsuite name="Unit">
             <directory suffix=".php">tests/Unit</directory>
+            <exclude>tests/Unit/Stubs</exclude>
         </testsuite>
-        <!--
-        <testsuite name="Integration">
-            <directory suffix=".php">tests/Integration</directory>
-        </testsuite>
-        -->
     </testsuites>
 
-    <coverage>
+    <source>
         <include>
             <directory suffix=".php">models/</directory>
             <directory suffix=".php">controllers/</directory>
         </include>
+    </source>
+
+    <coverage>
         <report>
             <html outputDirectory="coverage-report"/>
         </report>

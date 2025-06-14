@@ -1,5 +1,6 @@
 <?php
-namespace Tests\Controllers;
+namespace App\Tests\Unit;
+
 
 use PHPUnit\Framework\TestCase;
 use App\Controllers\DebugHelper;

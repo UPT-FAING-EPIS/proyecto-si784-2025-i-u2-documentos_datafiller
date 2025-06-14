@@ -1,0 +1,182 @@
+<?xml version="1.0"?>
+<phpunit xmlns="https://schema.phpunit.de/coverage/1.0">
+  <build time="Sat Jun 14 12:53:01 CEST 2025" phpunit="10.5.46" coverage="10.1.16">
+    <runtime name="PHP" version="8.2.12" url="https://www.php.net/"/>
+    <driver name="xdebug" version="3.3.1"/>
+  </build>
+  <project source="C:\xampp\htdocs\proyecto-si784-2025-i-u2-documentos_datafiller\DATAFILLER">
+    <tests>
+      <test name="App\Tests\Unit\AnalyticsControllerTest::testRegistrarDescargaUsuarioNoAutenticado" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\AnalyticsControllerTest::testRegistrarDescargaUsuarioAutenticado" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\ClearResultsControllerTest::testClearResultsLimpiaVariablesDeSesionYRetornaSuccess" size="unknown" status="success"/>
+      <test name="Tests\Controllers\DebugHelperTest::testLogCreatesDirectoryAndFileAndWritesMessage" size="unknown" status="success"/>
+      <test name="Tests\Controllers\DebugHelperTest::testLogAppendsMessages" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\SqlAnalyzerControllerTest::testLimiteConsultasAgotadoDevuelveError" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\SqlAnalyzerControllerTest::testSinTablasEnScriptDevuelveSinTablas" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\SqlAnalyzerControllerTest::testEstructuraValidaDevuelveTablas" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\SqlAnalyzerControllerTest::testProcesarColumnaParserReturnsNullIfNoType" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\SqlAnalyzerControllerTest::testProcesarColumnaParserEnumSinValores" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\SqlAnalyzerControllerTest::testProcesarColumnaParserConOpcionesVariadas" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\SqlAnalyzerControllerTest::testConstruirModificadores" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\SqlAnalyzerControllerTest::testLimpiarScript" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\SqlAnalyzerControllerTest::testDeterminarTipoGeneracionPorNombre" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\SqlAnalyzerControllerTest::testDividirPorComasSegurasConCasosComplejos" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\SqlAnalyzerControllerTest::testDeterminarTipoGeneracionSwitches" size="unknown" status="success"/>
+      <test name="UsuarioControllerTest::testObtenerDatosParaHeaderSinUsuario" size="unknown" status="success"/>
+      <test name="UsuarioControllerTest::testObtenerDatosParaHeaderConUsuario" size="unknown" status="success"/>
+      <test name="UsuarioControllerTest::testObtenerInfoUsuario" size="unknown" status="success"/>
+      <test name="UsuarioControllerTest::testObtenerConsultasRestantes" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\UsuarioTest::testBuscarPorEmail" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\UsuarioTest::testBuscarPorEmailException" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\UsuarioTest::testObtenerInfoCompleta" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\UsuarioTest::testObtenerInfoUsuario" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\UsuarioTest::testCrearDevuelveFalseCuandoYaExisteUsuario" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\UsuarioTest::testCrearDevuelveFalseCuandoInsercionFalla" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\UsuarioTest::testCrearInsertaYDevuelveTrueCuandoNoExiste" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\UsuarioTest::testBuscarPorNombre" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\UsuarioTest::testBuscarPorNombreException" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\UsuarioTest::testValidarLoginExitoYFallo" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\UsuarioTest::testPuedeRealizarConsultaCatchException" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\UsuarioTest::testPuedeRealizarConsultaPremium" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\UsuarioTest::testPuedeRealizarConsultaNuevoDia" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\UsuarioTest::testPuedeRealizarConsultaMismoDiaMenosLimite" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\UsuarioTest::testPuedeRealizarConsultaMismoDiaMaximo" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\UsuarioTest::testIncrementarConsultas" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\UsuarioTest::testObtenerConsultasHoy" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\UsuarioTest::testObtenerConsultasRestantes" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\UsuarioTest::testActualizarPlan" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\UsuarioTest::testExisteUsuario" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\UsuarioTest::testCrudTokensYPassword" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\UsuarioTest::testLimpiarTokensExpiradosExecuteFails" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\UsuarioTest::testLimpiarTokensExpiradosException" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\UsuarioTest::testObtenerPlanUsuario" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\UsuarioTest::testObtenerEstadisticasUsuario" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\UsuarioTest::testCalcularConsultasRestantes" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\UsuarioTest::testPuedeRealizarConsultaUsuarioNoExiste" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\UsuarioTest::testValidarLoginCatchBlock" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\UsuarioTest::testValidarLoginUsuarioNoExiste" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\UsuarioTest::testIncrementarConsultasNuevoDia" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\UsuarioTest::testIncrementarConsultasCatchException" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\UsuarioTest::testIncrementarConsultasSinRegistros" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\UsuarioTest::testValidarLoginDevuelveFalsoSiNoExisteUsuario" size="unknown" status="success"/>
+      <test name="App\Tests\Unit\UsuarioTest::testValidarLoginCachaExcepcionYDevuelveFalso" size="unknown" status="success"/>
+    </tests>
+    <directory name="/">
+      <totals>
+        <lines total="2278" comments="184" code="2094" executable="1248" executed="498" percent="39.90"/>
+        <methods count="79" tested="20" percent="25.32"/>
+        <functions count="1" tested="0" percent="0.00"/>
+        <classes count="10" tested="1" percent="10.00"/>
+        <traits count="0" tested="0" percent="0"/>
+      </totals>
+      <directory name="controllers">
+        <totals>
+          <lines total="1759" comments="125" code="1634" executable="993" executed="291" percent="29.31"/>
+          <methods count="57" tested="12" percent="21.05"/>
+          <functions count="1" tested="0" percent="0.00"/>
+          <classes count="9" tested="1" percent="11.11"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+        <file name="AnalyticsController.php" href="controllers/AnalyticsController.php.xml">
+          <totals>
+            <lines total="43" comments="0" code="43" executable="18" executed="15" percent="83.33"/>
+            <methods count="2" tested="1" percent="50.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="ClearResultsController.php" href="controllers/ClearResultsController.php.xml">
+          <totals>
+            <lines total="27" comments="4" code="23" executable="10" executed="9" percent="90.00"/>
+            <methods count="1" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="DataGeneratorController.php" href="controllers/DataGeneratorController.php.xml">
+          <totals>
+            <lines total="598" comments="35" code="563" executable="335" executed="0" percent="0.00"/>
+            <methods count="21" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="DebugHelper.php" href="controllers/DebugHelper.php.xml">
+          <totals>
+            <lines total="13" comments="0" code="13" executable="5" executed="5" percent="100.00"/>
+            <methods count="1" tested="1" percent="100.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="1" percent="100.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="FileProcessorController.php" href="controllers/FileProcessorController.php.xml">
+          <totals>
+            <lines total="229" comments="1" code="228" executable="156" executed="0" percent="0.00"/>
+            <methods count="11" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="LoginController.php" href="controllers/LoginController.php.xml">
+          <totals>
+            <lines total="52" comments="6" code="46" executable="25" executed="0" percent="0.00"/>
+            <methods count="2" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="RegistroController.php" href="controllers/RegistroController.php.xml">
+          <totals>
+            <lines total="97" comments="11" code="86" executable="57" executed="0" percent="0.00"/>
+            <methods count="2" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="SqlAnalyzerController.php" href="controllers/SqlAnalyzerController.php.xml">
+          <totals>
+            <lines total="658" comments="68" code="590" executable="371" executed="249" percent="67.12"/>
+            <methods count="13" tested="7" percent="53.85"/>
+            <functions count="1" tested="0" percent="0.00"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="UsuarioController.php" href="controllers/UsuarioController.php.xml">
+          <totals>
+            <lines total="42" comments="0" code="42" executable="16" executed="13" percent="81.25"/>
+            <methods count="4" tested="3" percent="75.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+      </directory>
+      <directory name="models">
+        <totals>
+          <lines total="519" comments="59" code="460" executable="255" executed="207" percent="81.18"/>
+          <methods count="22" tested="8" percent="36.36"/>
+          <functions count="0" tested="0" percent="0"/>
+          <classes count="1" tested="0" percent="0.00"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+        <file name="Usuario.php" href="models/Usuario.php.xml">
+          <totals>
+            <lines total="519" comments="59" code="460" executable="255" executed="207" percent="81.18"/>
+            <methods count="22" tested="8" percent="36.36"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+      </directory>
+    </directory>
+  </project>
+</phpunit>

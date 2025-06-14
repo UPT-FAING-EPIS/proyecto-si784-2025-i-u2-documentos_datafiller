@@ -1,0 +1,8 @@
+{
+  "source": {
+    "directories": ["../DATAFILLER"]
+  },
+  "logs": {
+    "html": "mutation-report/index.html"
+  }
+}
