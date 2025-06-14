@@ -77,7 +77,8 @@ class DataGeneratorController {
                 'contenido' => $contenido_final
             ];
             
-        } catch(Exception $e) {
+        } catch(\Exception $e) {
+
             error_log("Error generando datos: " . $e->getMessage());
             return [
                 'exito' => false,
@@ -87,7 +88,7 @@ class DataGeneratorController {
         }
     }
     
-    private function generarDatosTabla($tabla_config, $configuracion_global) {
+    protected function generarDatosTabla($tabla_config, $configuracion_global) {
         $nombre_tabla = $tabla_config['nombre'];
         $cantidad = $tabla_config['cantidad'];
         $columnas = $tabla_config['columnas'];
@@ -120,7 +121,7 @@ class DataGeneratorController {
         return $datos;
     }
     
-    private function generarValorColumna($columna, $tipo_generacion, $valor_personalizado, $indice, &$contadores, $referencias) {
+    protected function generarValorColumna($columna, $tipo_generacion, $valor_personalizado, $indice, &$contadores, $referencias) {
         $nombre_columna = $columna['nombre'];
         $nombre_lower = strtolower($nombre_columna);
         
@@ -230,6 +231,7 @@ class DataGeneratorController {
         }
     }
     
+    
     private function generarTelefono() {
         $prefijos = ['987', '986', '985', '984', '983', '982', '981', '980'];
         return $this->faker->randomElement($prefijos) . $this->faker->numerify('######');
@@ -325,7 +327,7 @@ class DataGeneratorController {
         return $valor;
     }
     
-    private function convertirAFormato($resultado, $configuracion) {
+    protected function convertirAFormato($resultado, $configuracion) {
         switch($configuracion['formato_salida']) {
             case 'sql':
                 return $this->convertirASQL($resultado, $configuracion);
@@ -460,7 +462,7 @@ class DataGeneratorController {
         return $total_registros <= 2000;
     }
     
-    private function registrarGeneracion($usuario_id, $estadisticas) {
+    protected function registrarGeneracion($usuario_id, $estadisticas) {
         try {
             $query = "INSERT INTO tbauditoria_consultas (usuario_id, tipo_consulta, cantidad_registros, formato_exportacion, fecha_consulta, ip_usuario) 
                       VALUES (:usuario_id, 'generacion_datos', :cantidad, :formato, NOW(), :ip)";
@@ -506,7 +508,7 @@ class DataGeneratorController {
         return $referencias;
     }
     
-    private function ordenarTablasPorDependencias($tablas) {
+    protected function ordenarTablasPorDependencias($tablas) {
         $tablas_ordenadas = [];
         $tablas_con_fks = [];
         
@@ -596,3 +598,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     exit();
 }
+
+
