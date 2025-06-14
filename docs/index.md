@@ -1,7 +1,7 @@
 # DATAFILLER - Documentación Técnica
 
 ## Información del Proyecto
-- **Materia:** SI784 - Sistemas de Información  
+- **Materia:** SI784 - Calidad y Pruebas de Software
 - **Gestión:** 2025-I
 - **Unidad:** U2 - Documentos DataFiller
 - **Tecnología:** PHP 8.0.30
@@ -12,9 +12,9 @@ DataFiller es una plataforma web diseñada para automatizar la generación de da
 
 ## 📹 Video Demostrativo
 
-[![DataFiller Demo](https://img.youtube.com/vi/SzGoWlZsskU/0.jpg)](https://youtu.be/SzGoWlZsskU)
+[![DataFiller Demo](https://img.youtube.com/vi/SzGoWlZsskU/0.jpg)](https://youtu.be/0Y12wd3FXlg)
 
-[Ver demostración completa del sistema](https://youtu.be/SzGoWlZsskU)
+[Ver demostración completa del sistema](https://youtu.be/0Y12wd3FXlg)
 
 ## 📚 Documentación Disponible
 
@@ -24,14 +24,14 @@ DataFiller es una plataforma web diseñada para automatizar la generación de da
 - [📄 FD03 - Informe de SRS](informes/fd03-informe-srs.md)
 - [📄 FD04 - Informe de SAD](informes/fd04-informe-sad.md)
 - [📄 FD05 - Informe de Proyecto Final](informes/fd05-informe-final.md)
-- [📄 FD   - DICCIONARIO DE DATOS](informes/DICCIONARIO_DE_DATOS.md)
-- [📄 Diapo   - Markdown](informes/markdown.md)
+- [📄 FD07 - DICCIONARIO DE DATOS](informes/DICCIONARIO_DE_DATOS.md)
+- [📄 Diapositivas - Markdown](informes/markdown.md)
 
 
 ### Manuales Técnicos
 - [📖 Manual de Usuario](manual/user-manual.md)
 - [🔧 Documentación Técnica](manual/technical.md)
-- [📋 FD05 - Informe de Documentación](manual/fd05-informe.md)
+- [📋 Informe de Documentación](manual/fd05-informe.md)
 
 ### Enlaces del Sistema
 - **Producción:** https://datafiller3.sytes.net/
