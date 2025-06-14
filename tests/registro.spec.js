@@ -3,7 +3,7 @@ const { test, expect } = require('@playwright/test');
 test.use({ video: 'on' });
 
 test('Prueba de registro de nuevo usuario', async ({ page }) => {
-  await page.goto('http://localhost/proyecto-si784-2025-i-u2-documentos_datafiller/DATAFILLER/views/Auth/registro_view.php', { timeout: 10000 });
+  await page.goto('https://datafiller3.sytes.net/views/Auth/registro_view.php', { timeout: 10000 });
 
   const timestamp = Date.now();
   await page.fill('input[name="nombre"]', `usuario_test_${timestamp}`);

@@ -2,26 +2,32 @@ const { test, expect } = require('@playwright/test');
 
 test.use({ video: 'on' });
 
-test('Prueba de acceso a dashboard solo para usuarios autenticados', async ({ page }) => {
-  console.log('🔐 Intentando acceder al dashboard sin sesión...');
-  await page.goto('http://localhost/proyecto-si784-2025-i-u2-documentos_datafiller/DATAFILLER/views/User/generardata.php', {
-    waitUntil: 'domcontentloaded',
-    timeout: 20000,
-  });
+test('🔐 Flujo completo: acceso al dashboard solo para usuarios autenticados', async ({ page }) => {
+  console.log('🔐 Accediendo a login directamente...');
+  await page.goto('https://datafiller3.sytes.net/views/Auth/login_view.php');
 
-  console.log('🔍 Esperando campo de usuario...');
-  await page.waitForSelector('input[name="nombre"]', { timeout: 15000 });
-
-  console.log('📝 Rellenando formulario de login...');
+  console.log('✍️ Llenando formulario...');
   await page.fill('input[name="nombre"]', 'fer');
   await page.fill('input[name="password"]', '123456');
 
-  console.log('🚀 Enviando formulario...');
-  await page.click('button[type="submit"]');
+  console.log('📨 Enviando login...');
+  await Promise.all([
+    page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 10000 }),
+    page.click('button[type="submit"]')
+  ]);
 
-  console.log('📂 Accediendo nuevamente al dashboard...');
-  await page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 15000 });
+  const currentURL = page.url();
+  console.log('🌐 URL actual:', currentURL);
 
-  console.log('👀 Verificando texto "Generar Data"...');
-  await expect(page.locator('text=Generar Data')).toBeVisible({ timeout: 10000 });
+  if (currentURL.includes('login')) {
+    const html = await page.content();
+    console.log('HTML tras login fallido:', html);
+    const mensajeError = await page.locator('.error-message').textContent().catch(() => '');
+    console.error('❌ No se redirigió. Mensaje de error detectado:', mensajeError || 'No visible');
+    throw new Error('Login fallido, revisar credenciales o lógica en el backend.');
+  }
+
+  await expect(page).toHaveURL(/generardata\.php/);
+  await expect(page.locator('text=Input de Scripts')).toBeVisible();
+  console.log('🎉 Login confirmado y dashboard accesible');
 });

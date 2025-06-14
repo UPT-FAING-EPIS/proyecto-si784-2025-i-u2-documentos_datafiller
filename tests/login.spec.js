@@ -5,7 +5,7 @@ test.use({ video: 'on' });
 test('Prueba de login en el sistema - caso exitoso', async ({ page }) => {
   console.log('🔐 Iniciando prueba de login...');
 
-  await page.goto('http://localhost/proyecto-si784-2025-i-u2-documentos_datafiller/DATAFILLER/views/Auth/login_view.php', {
+  await page.goto('https://datafiller3.sytes.net/views/Auth/login_view.php', {
     timeout: 10000
   });
   console.log('✅ Página de login cargada');
