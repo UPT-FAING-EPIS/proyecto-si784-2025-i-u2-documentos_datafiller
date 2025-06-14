@@ -443,7 +443,7 @@ class DataGeneratorController {
         return $xml;
     }
     
-    private function verificarLimitesUsuario($usuario_id, $configuracion) {
+    protected function verificarLimitesUsuario($usuario_id, $configuracion) {
         $usuario_info = $this->usuarioModel->obtenerInfoUsuario($usuario_id);
         
         if($usuario_info['plan'] === 'premium') {

@@ -71,4 +71,121 @@ class RegistroControllerTest extends TestCase
     }
 
     // Agrega más pruebas para cada caso del método.
+    public function testRegistrarContrasenaMuyCorta()
+{
+    $datos = [
+        'nombre' => 'Juan',
+        'apellido_paterno' => 'Pérez',
+        'apellido_materno' => 'Gómez',
+        'email' => 'juan@example.com',
+        'password' => '123',
+        'confirm_password' => '123'
+    ];
+
+    $resultado = $this->registroController->registrar($datos);
+
+    $this->assertFalse($resultado['exito']);
+    $this->assertEquals('La contraseña debe tener al menos 6 caracteres.', $resultado['mensaje']);
+}
+public function testRegistrarUsuarioYaExiste()
+{
+    $mockUsuario = $this->getMockBuilder(Usuario::class)
+        ->disableOriginalConstructor()
+        ->onlyMethods(['buscarPorNombre'])
+        ->getMock();
+
+    $mockUsuario->expects($this->once())
+        ->method('buscarPorNombre')
+        ->with('juan')
+        ->willReturn(['id' => 1]);
+
+    // Inyectamos el mock usando reflection
+    $reflection = new \ReflectionClass($this->registroController);
+    $prop = $reflection->getProperty('usuarioModel');
+    $prop->setAccessible(true);
+    $prop->setValue($this->registroController, $mockUsuario);
+
+    $datos = [
+        'nombre' => 'Juan',
+        'apellido_paterno' => 'Pérez',
+        'apellido_materno' => 'Gómez',
+        'email' => 'juan@example.com',
+        'password' => 'contraseña123',
+        'confirm_password' => 'contraseña123'
+    ];
+
+    $resultado = $this->registroController->registrar($datos);
+
+    $this->assertFalse($resultado['exito']);
+    $this->assertEquals('El nombre de usuario ya está registrado. Elija otro nombre.', $resultado['mensaje']);
+}
+public function testRegistrarEmailYaExiste()
+{
+    $mockUsuario = $this->getMockBuilder(Usuario::class)
+        ->disableOriginalConstructor()
+        ->onlyMethods(['buscarPorNombre', 'buscarPorEmail'])
+        ->getMock();
+
+    $mockUsuario->method('buscarPorNombre')->willReturn(null);
+    $mockUsuario->method('buscarPorEmail')->willReturn(['id' => 1]);
+
+    $reflection = new \ReflectionClass($this->registroController);
+    $prop = $reflection->getProperty('usuarioModel');
+    $prop->setAccessible(true);
+    $prop->setValue($this->registroController, $mockUsuario);
+
+    $datos = [
+        'nombre' => 'Juan',
+        'apellido_paterno' => 'Pérez',
+        'apellido_materno' => 'Gómez',
+        'email' => 'juan@example.com',
+        'password' => 'contraseña123',
+        'confirm_password' => 'contraseña123'
+    ];
+
+    $resultado = $this->registroController->registrar($datos);
+
+    $this->assertFalse($resultado['exito']);
+    $this->assertEquals('Este email ya está registrado. Solo se permite una cuenta por email.', $resultado['mensaje']);
+}
+public function testRegistrarExitoso()
+{
+    $mockUsuario = $this->getMockBuilder(Usuario::class)
+        ->disableOriginalConstructor()
+        ->onlyMethods(['buscarPorNombre', 'buscarPorEmail', 'crear'])
+        ->getMock();
+
+    $mockUsuario->method('buscarPorNombre')->willReturn(null);
+    $mockUsuario->method('buscarPorEmail')->willReturn(null);
+    $mockUsuario->method('crear')->willReturn(true);
+
+    // Simular que se asigna un ID después de crear
+    $mockUsuario->id = 123;
+
+    $reflection = new \ReflectionClass($this->registroController);
+    $prop = $reflection->getProperty('usuarioModel');
+    $prop->setAccessible(true);
+    $prop->setValue($this->registroController, $mockUsuario);
+
+    // Datos válidos
+    $datos = [
+        'nombre' => 'Juan',
+        'apellido_paterno' => 'Pérez',
+        'apellido_materno' => 'Gómez',
+        'email' => 'juan@example.com',
+        'password' => 'contraseña123',
+        'confirm_password' => 'contraseña123'
+    ];
+
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        session_destroy();
+    }
+
+    $resultado = $this->registroController->registrar($datos);
+
+    $this->assertTrue($resultado['exito']);
+    $this->assertEquals('Registro exitoso. Redirigiendo a promoción de planes...', $resultado['mensaje']);
+    $this->assertEquals(123, $_SESSION['usuario']['id']);
+}
+
 }

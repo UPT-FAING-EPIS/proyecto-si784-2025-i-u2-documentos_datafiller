@@ -40,4 +40,28 @@ final class DataGeneratorControllerTest extends TestCase
     {
         $this->assertInstanceOf(DataGeneratorController::class, $this->controller);
     }
+
+    public function testGenerarDatosCuandoSeSuperaElLimite(): void
+{
+    // Creamos un mock parcial del controlador
+    $controllerMock = $this->getMockBuilder(DataGeneratorController::class)
+        ->setConstructorArgs(['es_ES', $this->usuarioMock])
+        ->onlyMethods(['verificarLimitesUsuario'])
+        ->getMock();
+
+    // Simulamos que el usuario ha superado los límites
+    $controllerMock->method('verificarLimitesUsuario')->willReturn(false);
+
+    $configuracionFalsa = [
+        'formato_salida' => 'json',
+        'tablas' => []
+    ];
+
+    $respuesta = $controllerMock->generarDatos($configuracionFalsa, 1);
+
+    $this->assertFalse($respuesta['exito']);
+    $this->assertEquals('limite_superado', $respuesta['tipo']);
+    $this->assertEquals('Has superado los límites de tu plan. Actualiza a Premium para más registros.', $respuesta['mensaje']);
+}
+
 }
