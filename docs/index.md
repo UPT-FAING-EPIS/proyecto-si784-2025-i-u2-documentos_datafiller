@@ -35,7 +35,6 @@ DataFiller es una plataforma web diseñada para automatizar la generación de da
 
 ### Enlaces del Sistema
 - **Producción:** https://datafiller3.sytes.net/
-- **Documentación:** https://datafiller2-b2cbeph0h3a3hfgy.eastus-01.azurewebsites.net/docs/
 
 ## Arquitectura del Sistema
 
