@@ -122,130 +122,118 @@ class DataGeneratorController {
     }
     
     protected function generarValorColumna($columna, $tipo_generacion, $valor_personalizado, $indice, &$contadores, $referencias) {
-        $nombre_columna = $columna['nombre'];
-        $nombre_lower = strtolower($nombre_columna);
-        
-        // Valor personalizado tiene prioridad
-        if($tipo_generacion === 'personalizado' && !empty($valor_personalizado)) {
-            return $this->procesarValorPersonalizado($valor_personalizado, $indice);
+    $nombre_columna = $columna['nombre'];
+    $nombre_lower = strtolower($nombre_columna);
+
+    // Valor personalizado tiene prioridad
+    if($tipo_generacion === 'personalizado' && !empty($valor_personalizado)) {
+        return $this->procesarValorPersonalizado($valor_personalizado, $indice);
+    }
+
+    // ✅ ENUM - USAR VALORES DETECTADOS
+    if($tipo_generacion === 'enum_values' || 
+       ($columna['tipo_sql'] === 'ENUM' && !empty($columna['enum_values']))) {
+        return $this->faker->randomElement($columna['enum_values']);
+    }
+
+    // ✅ AUTO INCREMENT (DEBE IR PRIMERO)
+    if($tipo_generacion === 'auto_increment' || 
+       (isset($columna['es_auto_increment']) && $columna['es_auto_increment'])) {
+        if(!isset($contadores[$nombre_columna])) {
+            $contadores[$nombre_columna] = 1;
         }
-        
-        // ✅ ENUM - USAR VALORES DETECTADOS
-        if($tipo_generacion === 'enum_values' || 
-           ($columna['tipo_sql'] === 'ENUM' && !empty($columna['enum_values']))) {
-            error_log("GENERANDO ENUM para {$nombre_columna}: " . print_r($columna['enum_values'], true));
-            return $this->faker->randomElement($columna['enum_values']);
+        return $contadores[$nombre_columna]++;
+    }
+
+    // ✅ FOREIGN KEY - Usar ID existente
+    if($tipo_generacion === 'foreign_key' || 
+       (isset($columna['es_foreign_key']) && $columna['es_foreign_key'])) {
+        $tabla_ref = $columna['references_table'] ?? null;
+        if($tabla_ref && isset($referencias[$tabla_ref]) && !empty($referencias[$tabla_ref])) {
+            return $this->faker->randomElement($referencias[$tabla_ref]);
         }
-        
-        // ✅ AUTO INCREMENT (DEBE IR PRIMERO)
-        if($tipo_generacion === 'auto_increment' || 
-           (isset($columna['es_auto_increment']) && $columna['es_auto_increment'])) {
+        return rand(1, 100); // ✅ FALLBACK GENÉRICO
+    }
+
+    // Generar según el tipo (resto igual)
+    switch($tipo_generacion) {
+        case 'nombre_persona':
+            return $this->faker->name();
+        case 'email':
+            return $this->faker->email();
+        case 'telefono':
+            return $this->generarTelefono();
+        case 'direccion':
+            return $this->faker->address();
+        case 'fecha':
+            return $this->generarFecha($columna);
+        case 'fecha_hora':
+            return $this->generarFechaHora($columna);
+        case 'numero_entero':
+            return $this->generarNumeroEntero($columna);
+        case 'numero_decimal':
+            return $this->generarNumeroDecimal($columna);
+        case 'precio':
+            return $this->faker->randomFloat(2, 10, 9999);
+        case 'booleano':
+            return $this->faker->boolean() ? 1 : 0;
+        case 'texto_aleatorio':
+            return $this->generarTextoAleatorio($columna);
+        case 'primary_key_manual':
             if(!isset($contadores[$nombre_columna])) {
                 $contadores[$nombre_columna] = 1;
             }
             return $contadores[$nombre_columna]++;
-        }
-        
-        // ✅ FOREIGN KEY - Usar ID existente
-        if($tipo_generacion === 'foreign_key' || 
-           (isset($columna['es_foreign_key']) && $columna['es_foreign_key'])) {
-            $tabla_ref = $columna['references_table'] ?? null;
-            if($tabla_ref && isset($referencias[$tabla_ref]) && !empty($referencias[$tabla_ref])) {
-                return $this->faker->randomElement($referencias[$tabla_ref]);
-            }
-            return rand(1, 100); // ✅ FALLBACK GENÉRICO
-        }
-        
-        // ✅ DETECCIÓN GENÉRICA POR NOMBRE (NO HARDCODE)
-        if($nombre_lower === 'password' || $nombre_lower === 'contraseña') {
-            return password_hash('123456', PASSWORD_DEFAULT);
-        }
-        
-        if(strpos($nombre_lower, 'email') !== false || strpos($nombre_lower, 'correo') !== false) {
-            return $this->faker->email();
-        }
-        
-        if(strpos($nombre_lower, 'telefono') !== false || strpos($nombre_lower, 'phone') !== false) {
-            return $this->generarTelefono();
-        }
-        
-        if(strpos($nombre_lower, 'nombre') !== false && strpos($nombre_lower, 'usuario') === false) {
-            return $this->faker->name();
-        }
-        
-        if(strpos($nombre_lower, 'direccion') !== false || strpos($nombre_lower, 'address') !== false) {
-            return $this->faker->address();
-        }
-        
-        if(strpos($nombre_lower, 'fecha') !== false || strpos($nombre_lower, 'date') !== false) {
-            return $this->generarFecha($columna);
-        }
-        
-        if(strpos($nombre_lower, 'precio') !== false || strpos($nombre_lower, 'price') !== false) {
-            return $this->faker->randomFloat(2, 10, 9999);
-        }
-        
-        // Generar según el tipo (resto igual)
-        switch($tipo_generacion) {
-            case 'nombre_persona':
-                return $this->faker->name();
-                
-            case 'email':
-                return $this->faker->email();
-                
-            case 'telefono':
-                return $this->generarTelefono();
-                
-            case 'direccion':
-                return $this->faker->address();
-                
-            case 'fecha':
-                return $this->generarFecha($columna);
-                
-            case 'fecha_hora':
-                return $this->generarFechaHora($columna);
-                
-            case 'numero_entero':
-                return $this->generarNumeroEntero($columna);
-                
-            case 'numero_decimal':
-                return $this->generarNumeroDecimal($columna);
-                
-            case 'precio':
-                return $this->faker->randomFloat(2, 10, 9999);
-                
-            case 'booleano':
-                return $this->faker->boolean() ? 1 : 0;
-                
-            case 'texto_aleatorio':
-                return $this->generarTextoAleatorio($columna);
-                
-            case 'primary_key_manual':
-                if(!isset($contadores[$nombre_columna])) {
-                    $contadores[$nombre_columna] = 1;
-                }
-                return $contadores[$nombre_columna]++;
-                
-            default:
-                return $this->generarPorTipoSQL($columna);
-        }
     }
+
+    // ✅ DETECCIÓN GENÉRICA POR NOMBRE (NO HARDCODE)
+    if($nombre_lower === 'password' || $nombre_lower === 'contraseña') {
+        return password_hash('123456', PASSWORD_DEFAULT);
+    }
+
+    if(strpos($nombre_lower, 'email') !== false || strpos($nombre_lower, 'correo') !== false) {
+        return $this->faker->email();
+    }
+
+    if(strpos($nombre_lower, 'telefono') !== false || strpos($nombre_lower, 'phone') !== false) {
+        return $this->generarTelefono();
+    }
+
+    if(strpos($nombre_lower, 'nombre') !== false && strpos($nombre_lower, 'usuario') === false) {
+        return $this->faker->name();
+    }
+
+    if(strpos($nombre_lower, 'direccion') !== false || strpos($nombre_lower, 'address') !== false) {
+        return $this->faker->address();
+    }
+
+    if(strpos($nombre_lower, 'fecha') !== false || strpos($nombre_lower, 'date') !== false) {
+        return $this->generarFecha($columna);
+    }
+
+    if(strpos($nombre_lower, 'precio') !== false || strpos($nombre_lower, 'price') !== false) {
+        return $this->faker->randomFloat(2, 10, 9999);
+    }
+
+    // Fallback por tipo SQL
+    return $this->generarPorTipoSQL($columna);
+}
     
     
-    private function generarTelefono() {
+    protected function generarTelefono() {
         $prefijos = ['987', '986', '985', '984', '983', '982', '981', '980'];
         return $this->faker->randomElement($prefijos) . $this->faker->numerify('######');
     }
     
-    private function generarFecha($columna) {
+    protected function generarFecha($columna) {
         return $this->faker->date('Y-m-d');
     }
     
-    private function generarFechaHora($columna) {
+    protected function generarFechaHora($columna) {
         return $this->faker->dateTime()->format('Y-m-d H:i:s');
     }
     
-    private function generarNumeroEntero($columna) {
+    protected function generarNumeroEntero($columna) {
         $min = 1;
         $max = 999999;
         
@@ -256,15 +244,15 @@ class DataGeneratorController {
         
         return $this->faker->numberBetween($min, $max);
     }
-    
-    private function generarNumeroDecimal($columna) {
+
+    protected function generarNumeroDecimal($columna) {
         $decimales = $columna['decimales'] ?? 2;
         $max = $columna['longitud'] ? pow(10, $columna['longitud'] - $decimales) - 1 : 9999;
         
         return $this->faker->randomFloat($decimales, 1, $max);
     }
-    
-    private function generarTextoAleatorio($columna) {
+
+    protected function generarTextoAleatorio($columna) {
         $longitud = $columna['longitud'] ?? 100;
         
         if($longitud <= 10) {
@@ -277,8 +265,8 @@ class DataGeneratorController {
             return $this->faker->paragraph();
         }
     }
-    
-    private function generarPorTipoSQL($columna) {
+
+    protected function generarPorTipoSQL($columna) {
         switch(strtoupper($columna['tipo_sql'])) {
             case 'ENUM':
                 if(!empty($columna['enum_values'])) {
@@ -317,8 +305,8 @@ class DataGeneratorController {
                 return $this->faker->word();
         }
     }
-    
-    private function procesarValorPersonalizado($valor, $indice) {
+
+    protected function procesarValorPersonalizado($valor, $indice) {
         // Procesar patrones especiales
         $valor = str_replace('{i}', $indice, $valor);
         $valor = str_replace('{random}', rand(1000, 9999), $valor);
@@ -341,8 +329,8 @@ class DataGeneratorController {
                 return $this->convertirASQL($resultado, $configuracion);
         }
     }
-    
-    private function convertirASQL($resultado, $configuracion) {
+
+    protected function convertirASQL($resultado, $configuracion) {
         $sql = '';
         
         // Incluir CREATE TABLE si está marcado
@@ -386,11 +374,11 @@ class DataGeneratorController {
         return $sql;
     }
     
-    private function convertirAJSON($resultado) {
+    protected function convertirAJSON($resultado) {
         return json_encode($resultado['datos_generados'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
-    
-    private function convertirACSV($resultado) {
+
+    protected function convertirACSV($resultado) {
         $csv = '';
         
         foreach($resultado['datos_generados'] as $nombre_tabla => $datos) {
@@ -420,8 +408,8 @@ class DataGeneratorController {
         
         return $csv;
     }
-    
-    private function convertirAXML($resultado) {
+
+    protected function convertirAXML($resultado) {
         $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
         $xml .= '<database>' . "\n";
         
@@ -476,8 +464,8 @@ class DataGeneratorController {
             error_log("Error registrando generación: " . $e->getMessage());
         }
     }
-    
-     private function obtenerReferenciasForeignKeys($tabla_config) {
+
+    protected function obtenerReferenciasForeignKeys($tabla_config) {
         $referencias = [];
         
         if(!isset($tabla_config['columnas'])) {

@@ -217,13 +217,20 @@ class FileProcessorController {
     public function handleDirectRequest() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header('Content-Type: application/json');
-            $result = $this->processFile();
-            echo json_encode($result);
-            exit();
+            echo json_encode($this->processFile());
         } else {
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'message' => 'Método no permitido']);
-            exit();
         }
+        $this->terminate();
+    }
+
+    /**
+     * @codeCoverageIgnore
+     * We wrap exit() so tests can override/spy instead of killing PHPUnit.
+     */
+    protected function terminate(): void
+    {
+        exit();
     }
 }
