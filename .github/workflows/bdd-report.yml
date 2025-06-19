@@ -1,4 +1,4 @@
-name: 📊 Reporte BDD - PHPUnit + Playwright + UI
+name: BDD - PHPUnit + Playwright
 
 on:
   push:
@@ -11,56 +11,45 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 📥 Checkout del código
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      # ----------- PHPUnit --------------
-      - name: 🐘 Configurar PHP
-        uses: shivammathur/setup-php@v2
+      - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
           extensions: mbstring, pdo_mysql
-          coverage: none
 
-      - name: 📦 Instalar dependencias de PHP
+      - name: Composer install
         run: |
           cd DATAFILLER
           composer install --no-interaction --prefer-dist
 
-      - name: ✅ Ejecutar pruebas PHPUnit
+      - name: Run PHPUnit
         run: |
           cd DATAFILLER
           ./vendor/bin/phpunit --testsuite Unit --log-junit phpunit-results.xml
 
-      # ----------- Playwright ------------
-      - name: 🧰 Configurar Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: 18
 
-      - name: 📦 Instalar dependencias de Node.js
+      - name: Node install
         run: |
           npm ci
           npx playwright install --with-deps
 
-      - name: 🧪 Ejecutar pruebas UI (tests/)
-        run: |
-          npx playwright test tests
+      - name: Run Playwright UI tests
+        run: npx playwright test tests
 
-      - name: 🧪 Ejecutar pruebas integración (DATAFILLER/tests/integration)
-        run: |
-          npx playwright test DATAFILLER/tests/integration
+      - name: Run Playwright integration tests
+        run: npx playwright test DATAFILLER/tests/integration
 
-      # ----------- Allure Reporte BDD ------------
-      - name: 📥 Instalar Allure CLI
-        run: |
-          npm install -g allure-commandline
+      - name: Install Allure CLI
+        run: npm install -g allure-commandline
 
-      - name: 📊 Generar Reporte Allure
-        run: |
-          npx allure generate --clean -o allure-report
+      - name: Generate Allure report
+        run: npx allure generate --clean -o allure-report
 
-      - name: ☁️ Subir Reporte BDD Allure
+      - name: Upload Allure report
         uses: actions/upload-artifact@v3
         with:
           name: BDD-Allure-Report
