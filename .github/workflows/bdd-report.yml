@@ -1,4 +1,4 @@
-name: BDD - PHPUnit + Playwright
+name: 📊 Reporte BDD - PHPUnit + Playwright + UI
 
 on:
   push:
@@ -11,45 +11,46 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: 📥 Checkout
+        uses: actions/checkout@v3
 
-      - uses: shivammathur/setup-php@v2
+      - name: 🐘 Setup PHP
+        uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
           extensions: mbstring, pdo_mysql
 
-      - name: Composer install
-        run: |
-          cd DATAFILLER
-          composer install --no-interaction --prefer-dist
+      - name: 📦 Composer install
+        working-directory: DATAFILLER
+        run: composer install --no-interaction --prefer-dist
 
-      - name: Run PHPUnit
-        run: |
-          cd DATAFILLER
-          ./vendor/bin/phpunit --testsuite Unit --log-junit phpunit-results.xml
+      - name: ✅ Run PHPUnit
+        working-directory: DATAFILLER
+        run: ./vendor/bin/phpunit --testsuite Unit --log-junit phpunit-results.xml
 
-      - uses: actions/setup-node@v3
+      - name: 🧰 Setup Node.js
+        uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: '18'
 
-      - name: Node install
+      - name: 📦 Node install and Playwright dependencies
         run: |
           npm ci
           npx playwright install --with-deps
 
-      - name: Run Playwright UI tests
+      - name: 🧪 Run Playwright UI tests
         run: npx playwright test tests
 
-      - name: Run Playwright integration tests
+      - name: 🧪 Run Playwright integration tests
         run: npx playwright test DATAFILLER/tests/integration
 
-      - name: Install Allure CLI
+      - name: 📊 Install Allure CLI
         run: npm install -g allure-commandline
 
-      - name: Generate Allure report
+      - name: 🧪 Generate Allure report
         run: npx allure generate --clean -o allure-report
 
-      - name: Upload Allure report
+      - name: ☁️ Upload Allure report
         uses: actions/upload-artifact@v3
         with:
           name: BDD-Allure-Report
