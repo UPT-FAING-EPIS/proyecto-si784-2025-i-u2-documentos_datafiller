@@ -51,6 +51,11 @@ jobs:
         run: |
           npx playwright test DATAFILLER/tests/integration
 
+      # ----------- Allure Reporte BDD ------------
+      - name: 📥 Instalar Allure CLI
+        run: |
+          npm install -g allure-commandline
+
       - name: 📊 Generar Reporte Allure
         run: |
           npx allure generate --clean -o allure-report
