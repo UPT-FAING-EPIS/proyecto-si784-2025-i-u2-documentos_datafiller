@@ -11,46 +11,51 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 📥 Checkout
+      - name: 📥 Checkout del código
         uses: actions/checkout@v3
 
-      - name: 🐘 Setup PHP
+      # ----------- PHPUnit --------------
+      - name: 🐘 Configurar PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
           extensions: mbstring, pdo_mysql
+          coverage: none
 
-      - name: 📦 Composer install
+      - name: 📦 Instalar dependencias de PHP
         working-directory: DATAFILLER
         run: composer install --no-interaction --prefer-dist
 
-      - name: ✅ Run PHPUnit
+      - name: ✅ Ejecutar pruebas PHPUnit
         working-directory: DATAFILLER
-        run: ./vendor/bin/phpunit --testsuite Unit --log-junit phpunit-results.xml
+        run: |
+          ./vendor/bin/phpunit --testsuite Unit --log-junit phpunit-results.xml
 
-      - name: 🧰 Setup Node.js
+      # ----------- Playwright ------------
+
+      - name: 🧰 Configurar Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
 
-      - name: 📦 Node install and Playwright dependencies
+      - name: 📦 Instalar dependencias de Node.js
         run: |
           npm ci
           npx playwright install --with-deps
 
-      - name: 🧪 Run Playwright UI tests
-        run: npx playwright test tests
+      - name: 🧪 Ejecutar pruebas UI
+        run: |
+          npx playwright test tests
 
-      - name: 🧪 Run Playwright integration tests
-        run: npx playwright test DATAFILLER/tests/integration
+      - name: 🧪 Ejecutar pruebas integración
+        run: |
+          npx playwright test DATAFILLER/tests/integration
 
-      - name: 📊 Install Allure CLI
-        run: npm install -g allure-commandline
+      - name: 📊 Generar Reporte Allure
+        run: |
+          npx allure generate --clean -o allure-report
 
-      - name: 🧪 Generate Allure report
-        run: npx allure generate --clean -o allure-report
-
-      - name: ☁️ Upload Allure report
+      - name: ☁️ Subir Reporte Allure como artefacto
         uses: actions/upload-artifact@v3
         with:
           name: BDD-Allure-Report
