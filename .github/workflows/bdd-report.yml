@@ -30,8 +30,9 @@ jobs:
       - name: ✅ Ejecutar pruebas PHPUnit
         run: |
           cd DATAFILLER
-          chmod +x ./vendor/bin/phpunit  # 👈 Permiso de ejecución corregido
-          ./vendor/bin/phpunit --testsuite Unit --log-junit phpunit-results.xml
+          chmod +x ./vendor/bin/phpunit
+          ./vendor/bin/phpunit --testsuite Unit --log-junit phpunit-results.xml --no-coverage
+
 
       # ----------- Playwright ------------
       - name: 🧰 Configurar Node.js
