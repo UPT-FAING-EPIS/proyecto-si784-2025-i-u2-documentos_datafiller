@@ -1,18 +1,4 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Tu título</title>
-    <!-- Aquí va el link al CSS -->
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <!-- Tu contenido -->
-    <main>
-        <!-- contenido del main -->
     </main>
-    
-    <!-- El footer va aquí, SIN el <head> -->
     <footer class="main-footer">
         <h1 class="titulo-principal">¡SÍGUENOS EN NUESTRAS REDES SOCIALES!</h1>
         <div class="social-media">
