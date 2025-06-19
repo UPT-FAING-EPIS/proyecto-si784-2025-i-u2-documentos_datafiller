@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - name: 📥 Checkout del código
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # ----------- PHPUnit --------------
       - name: 🐘 Configurar PHP
@@ -30,6 +30,7 @@ jobs:
       - name: ✅ Ejecutar pruebas PHPUnit
         run: |
           cd DATAFILLER
+          chmod +x ./vendor/bin/phpunit  # 👈 Permiso de ejecución corregido
           ./vendor/bin/phpunit --testsuite Unit --log-junit phpunit-results.xml
 
       # ----------- Playwright ------------
