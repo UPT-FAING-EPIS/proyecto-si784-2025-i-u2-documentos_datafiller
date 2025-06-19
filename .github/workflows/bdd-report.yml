@@ -33,7 +33,6 @@ jobs:
           chmod +x ./vendor/bin/phpunit
           ./vendor/bin/phpunit --testsuite Unit --log-junit phpunit-results.xml --no-coverage
 
-
       # ----------- Playwright ------------
       - name: 🧰 Configurar Node.js
         uses: actions/setup-node@v3
