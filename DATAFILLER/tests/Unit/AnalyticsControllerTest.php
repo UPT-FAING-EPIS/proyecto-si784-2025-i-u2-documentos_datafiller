@@ -81,4 +81,36 @@ final class AnalyticsControllerTest extends TestCase
         $prop->setAccessible(true);
         return $prop->getValue($controller);
     }
+
+    public function testRegistrarDescargaFallaPorExcepcion()
+{
+    $_SESSION['usuario'] = ['id' => 42];
+
+    // Mockeamos PDO y PDOStatement para simular una excepción en execute()
+    $stmtMock = $this->getMockBuilder(\PDOStatement::class)
+        ->disableOriginalConstructor()
+        ->onlyMethods(['bindParam', 'bindValue', 'execute'])
+        ->getMock();
+    $stmtMock->method('bindParam')->willReturn(true);
+    $stmtMock->method('bindValue')->willReturn(true);
+    $stmtMock->method('execute')->will($this->throwException(new \Exception('Fallo SQL')));
+
+    $pdoMock = $this->getMockBuilder(PDO::class)
+        ->disableOriginalConstructor()
+        ->onlyMethods(['prepare'])
+        ->getMock();
+    $pdoMock->method('prepare')->willReturn($stmtMock);
+
+    // Instancia el controlador real y reemplaza el PDO por el mock
+    $controller = new AnalyticsController();
+    $ref = new \ReflectionClass($controller);
+    $prop = $ref->getProperty('db');
+    $prop->setAccessible(true);
+    $prop->setValue($controller, $pdoMock);
+
+    $result = $controller->registrarDescarga('csv', 10);
+
+    $this->assertFalse($result['success']);
+    $this->assertEquals('Error interno', $result['message']);
+}
 }

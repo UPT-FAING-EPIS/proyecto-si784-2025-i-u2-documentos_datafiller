@@ -262,7 +262,7 @@ final class UsuarioTest extends TestCase
         $this->assertTrue($usuario->puedeRealizarConsulta(2));
     }
     
-
+    
     public function testPuedeRealizarConsultaMismoDiaMenosLimite(): void
     {
         $today = date('Y-m-d');
@@ -279,6 +279,33 @@ final class UsuarioTest extends TestCase
 
         $usuario = new Usuario($this->dbMock);
         $this->assertTrue($usuario->puedeRealizarConsulta(3));
+    }
+    
+    public function testResetearConsultasDiariasCausaPDOExceptionRetornaFalse()
+    {
+        $usuario_id = 123;
+        // Crear un mock de PDO que lanzará una excepción en prepare()
+        $pdoMock = $this->createMock(PDO::class);
+        $pdoMock->method('prepare')
+            ->will($this->throwException(new \PDOException('Fallo en prepare')));
+
+        $usuario = new \App\Models\Usuario($pdoMock);
+
+        $resultado = $usuario->resetearConsultasDiarias($usuario_id);
+        $this->assertFalse($resultado, "Debe retornar false si ocurre una excepción en prepare()");
+    }
+
+    public function testObtenerInfoCompletaCatchException()
+    {
+        $usuario_id = 99;
+        // Mock de PDO que lanza excepción en prepare
+        $pdoMock = $this->createMock(PDO::class);
+        $pdoMock->method('prepare')
+            ->will($this->throwException(new \PDOException('Simulated DB error')));
+
+        $usuario = new \App\Models\Usuario($pdoMock);
+
+        $this->assertFalse($usuario->obtenerInfoCompleta($usuario_id));
     }
 
     public function testPuedeRealizarConsultaMismoDiaMaximo(): void
@@ -299,6 +326,221 @@ final class UsuarioTest extends TestCase
         $this->assertFalse($usuario->puedeRealizarConsulta(4));
     }
 
+    public function testObtenerInfoUsuarioCatchException()
+    {
+        $usuario_id = 101;
+        // Mock de PDO que lanza excepción en prepare()
+        $pdoMock = $this->createMock(PDO::class);
+        $pdoMock->method('prepare')
+            ->will($this->throwException(new \PDOException('Simulated DB error')));
+
+        $usuario = new \App\Models\Usuario($pdoMock);
+
+        $this->assertFalse($usuario->obtenerInfoUsuario($usuario_id));
+    }
+
+    public function testObtenerConsultasHoyCatchException()
+    {
+        $usuario_id = 55;
+        // Mock de PDO que lanzará una excepción en prepare()
+        $pdoMock = $this->createMock(PDO::class);
+        $pdoMock->method('prepare')
+            ->will($this->throwException(new \PDOException('Simulated DB error')));
+
+        $usuario = new \App\Models\Usuario($pdoMock);
+
+        // Debe retornar 0 si ocurre una excepción
+        $this->assertSame(0, $usuario->obtenerConsultasHoy($usuario_id));
+    }
+
+    public function testObtenerPlanUsuarioCatchException()
+    {
+        $usuario_id = 1234;
+        // Mock de PDO que lanza excepción en prepare()
+        $pdoMock = $this->createMock(PDO::class);
+        $pdoMock->method('prepare')
+            ->will($this->throwException(new \PDOException('Simulated DB error')));
+
+        $usuario = new \App\Models\Usuario($pdoMock);
+
+        // Debe retornar 'gratuito' si ocurre una excepción
+        $this->assertSame('gratuito', $usuario->obtenerPlanUsuario($usuario_id));
+    }
+
+    public function testObtenerConsultasRestantesCatchException()
+    {
+        $usuario_id = 42;
+        // Mock de PDO (no se usará pero se requiere por el constructor)
+        $pdoMock = $this->createMock(PDO::class);
+
+        // Creamos un mock parcial de Usuario para simular que obtenerInfoUsuario lanza una excepción PDO
+        $usuarioMock = $this->getMockBuilder(\App\Models\Usuario::class)
+            ->setConstructorArgs([$pdoMock])
+            ->onlyMethods(['obtenerInfoUsuario'])
+            ->getMock();
+
+        $usuarioMock->method('obtenerInfoUsuario')
+            ->will($this->throwException(new \PDOException('Simulated DB error')));
+
+        // Debe retornar 0 si ocurre una excepción
+        $this->assertSame(0, $usuarioMock->obtenerConsultasRestantes($usuario_id));
+    }
+
+    public function testActualizarPlanCatchException()
+    {
+        $usuario_id = 77;
+        $nuevo_plan = 'premium';
+
+        // Mock de PDO que lanza excepción en prepare()
+        $pdoMock = $this->createMock(PDO::class);
+        $pdoMock->method('prepare')
+            ->will($this->throwException(new \PDOException('Simulated DB error')));
+
+        $usuario = new \App\Models\Usuario($pdoMock);
+
+        // Debe retornar false si ocurre una excepción
+        $this->assertFalse($usuario->actualizarPlan($usuario_id, $nuevo_plan));
+    }
+
+    public function testObtenerEstadisticasUsuarioCatchException()
+{
+    $usuario_id = 888;
+    // Mock de PDO que lanza excepción en prepare()
+    $pdoMock = $this->createMock(PDO::class);
+    $pdoMock->method('prepare')
+        ->will($this->throwException(new \PDOException('Simulated DB error')));
+
+    $usuario = new \App\Models\Usuario($pdoMock);
+
+    $resultado = $usuario->obtenerEstadisticasUsuario($usuario_id);
+
+    // El resultado debe tener todos los campos en 0 o null, como en el catch
+    $this->assertEquals([
+        'total_consultas' => 0,
+        'total_registros_generados' => 0,
+        'dias_activos' => 0,
+        'ultima_actividad' => null
+    ], $resultado);
+}
+
+public function testExisteUsuarioCatchException()
+{
+    $usuario_id = 555;
+    // Mock de PDO que lanza excepción en prepare()
+    $pdoMock = $this->createMock(PDO::class);
+    $pdoMock->method('prepare')
+        ->will($this->throwException(new \PDOException('Simulated DB error')));
+
+    $usuario = new \App\Models\Usuario($pdoMock);
+
+    // Debe retornar false si ocurre una excepción
+    $this->assertFalse($usuario->existeUsuario($usuario_id));
+}
+public function testGuardarTokenRecuperacionCatchException()
+{
+    $usuario_id = 1;
+    $token = 'fake-token';
+    $expiracion = '2025-12-31 23:59:59';
+
+    // Mock de PDO que lanza excepción en prepare()
+    $pdoMock = $this->createMock(PDO::class);
+    $pdoMock->method('prepare')
+        ->will($this->throwException(new \PDOException('Simulated DB error')));
+
+    $usuario = new \App\Models\Usuario($pdoMock);
+
+    // Debe retornar false si ocurre una excepción
+    $this->assertFalse($usuario->guardarTokenRecuperacion($usuario_id, $token, $expiracion));
+}
+
+public function testVerificarTokenRecuperacionCatchException()
+{
+    $token = 'token-ejemplo';
+
+    // Mock de PDO que lanza excepción en prepare()
+    $pdoMock = $this->createMock(PDO::class);
+    $pdoMock->method('prepare')
+        ->will($this->throwException(new \PDOException('Simulated DB error')));
+
+    $usuario = new \App\Models\Usuario($pdoMock);
+
+    // Debe retornar false si ocurre una excepción
+    $this->assertFalse($usuario->verificarTokenRecuperacion($token));
+}
+
+public function testVerificarTokenRecuperacionRetornaFalseSiNoExiste()
+{
+    $token = 'token-inexistente';
+
+    // Mock del statement que simula rowCount() === 0
+    $stmtMock = $this->createMock(PDOStatement::class);
+    $stmtMock->method('rowCount')
+        ->willReturn(0);
+
+    // El fetch nunca será llamado, pero si se llama, que retorne null
+    $stmtMock->method('fetch')
+        ->willReturn(null);
+
+    // Mock del PDO principal, que retorna el statement anterior
+    $pdoMock = $this->createMock(PDO::class);
+    $pdoMock->method('prepare')
+        ->willReturn($stmtMock);
+
+    $usuario = new \App\Models\Usuario($pdoMock);
+
+    // Verifica que retorne false cuando no hay coincidencias
+    $this->assertFalse($usuario->verificarTokenRecuperacion($token));
+}
+public function testCambiarPasswordCatchException()
+{
+    $usuario_id = 1;
+    $nueva_password = 'NuevaPasswordSegura123';
+
+    // Mock de PDO que lanza excepción en prepare()
+    $pdoMock = $this->createMock(PDO::class);
+    $pdoMock->method('prepare')
+        ->will($this->throwException(new \PDOException('Simulated DB error')));
+
+    $usuario = new \App\Models\Usuario($pdoMock);
+
+    // Debe retornar false si ocurre una excepción
+    $this->assertFalse($usuario->cambiarPassword($usuario_id, $nueva_password));
+}
+
+public function testMarcarTokenUsadoCatchException()
+{
+    $token = 'token-prueba';
+
+    // Mock de PDO que lanza excepción en prepare()
+    $pdoMock = $this->createMock(PDO::class);
+    $pdoMock->method('prepare')
+        ->will($this->throwException(new \PDOException('Simulated DB error')));
+
+    $usuario = new \App\Models\Usuario($pdoMock);
+
+    // Debe retornar false si ocurre una excepción
+    $this->assertFalse($usuario->marcarTokenUsado($token));
+}
+
+public function testCalcularConsultasRestantesCatchException()
+{
+    $usuario_id = 42;
+
+    // Mock de PDO (no se usará pero se requiere para el constructor)
+    $pdoMock = $this->createMock(PDO::class);
+
+    // Mock parcial de Usuario para simular que obtenerInfoUsuario lanza una excepción PDO
+    $usuarioMock = $this->getMockBuilder(\App\Models\Usuario::class)
+        ->setConstructorArgs([$pdoMock])
+        ->onlyMethods(['obtenerInfoUsuario'])
+        ->getMock();
+
+    $usuarioMock->method('obtenerInfoUsuario')
+        ->will($this->throwException(new \PDOException('Simulated DB error')));
+
+    // Debe retornar 0 si ocurre una excepción
+    $this->assertSame(0, $usuarioMock->calcularConsultasRestantes($usuario_id));
+}
     public function testIncrementarConsultas(): void
     {
         $today = date('Y-m-d');

@@ -104,4 +104,24 @@ class UsuarioControllerTest extends TestCase
 
         $this->assertEquals(7, $resultado);
     }
+    public function testConstructorInicializaDependencias()
+{
+    // Instancia normal del controlador (ejecuta el constructor real)
+    $controller = new UsuarioController();
+
+    // Refleja las propiedades privadas
+    $ref = new \ReflectionClass(UsuarioController::class);
+
+    $dbProp = $ref->getProperty('db');
+    $dbProp->setAccessible(true);
+    $db = $dbProp->getValue($controller);
+
+    $usuarioModelProp = $ref->getProperty('usuarioModel');
+    $usuarioModelProp->setAccessible(true);
+    $usuarioModel = $usuarioModelProp->getValue($controller);
+
+    // Verifica que las dependencias existen y son del tipo esperado
+    $this->assertNotNull($db);
+    $this->assertInstanceOf(\App\Models\Usuario::class, $usuarioModel);
+}
 }

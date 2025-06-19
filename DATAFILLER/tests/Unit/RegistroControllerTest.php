@@ -188,4 +188,36 @@ public function testRegistrarExitoso()
     $this->assertEquals(123, $_SESSION['usuario']['id']);
 }
 
+public function testRegistrarFallaAlCrearUsuario()
+{
+    $mockUsuario = $this->getMockBuilder(\App\Models\Usuario::class)
+        ->disableOriginalConstructor()
+        ->onlyMethods(['buscarPorNombre', 'buscarPorEmail', 'crear'])
+        ->getMock();
+
+    $mockUsuario->method('buscarPorNombre')->willReturn(null);
+    $mockUsuario->method('buscarPorEmail')->willReturn(null);
+    $mockUsuario->method('crear')->willReturn(false);
+
+    // Inyectar el mock en el controller
+    $reflection = new \ReflectionClass($this->registroController);
+    $prop = $reflection->getProperty('usuarioModel');
+    $prop->setAccessible(true);
+    $prop->setValue($this->registroController, $mockUsuario);
+
+    $datos = [
+        'nombre' => 'Juan',
+        'apellido_paterno' => 'Pérez',
+        'apellido_materno' => 'Gómez',
+        'email' => 'juan@example.com',
+        'password' => 'contraseña123',
+        'confirm_password' => 'contraseña123'
+    ];
+
+    $resultado = $this->registroController->registrar($datos);
+
+    $this->assertFalse($resultado['exito']);
+    $this->assertEquals('No se pudo completar el registro. Por favor intente nuevamente.', $resultado['mensaje']);
+}
+
 }

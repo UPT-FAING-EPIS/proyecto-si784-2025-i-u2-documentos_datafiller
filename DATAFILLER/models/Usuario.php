@@ -214,7 +214,7 @@ class Usuario {
     }
     
     // Método para resetear consultas diarias
-    private function resetearConsultasDiarias($usuario_id) {
+    public function resetearConsultasDiarias($usuario_id) {
         try {
             $query = "UPDATE " . $this->table . " 
                       SET consultas_diarias = 0, 
@@ -515,5 +515,6 @@ class Usuario {
             return 0;
         }
     }
+
 }
 ?>

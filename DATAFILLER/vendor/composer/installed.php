@@ -3,7 +3,7 @@
         'name' => 'datafiller/project',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'fb2a8584757657d91daa3ac029cd6e706d0394ba',
+        'reference' => '70cca6923cdae7c10f3847dd0d84df786d25cbff',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -40,7 +40,7 @@
         'datafiller/project' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => 'fb2a8584757657d91daa3ac029cd6e706d0394ba',
+            'reference' => '70cca6923cdae7c10f3847dd0d84df786d25cbff',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
