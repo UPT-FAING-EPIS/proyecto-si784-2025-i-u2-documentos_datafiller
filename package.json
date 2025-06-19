@@ -7,13 +7,18 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "npx playwright test"
+    "test": "npx playwright test",
+    "test:ui": "npx playwright test tests",
+    "test:integration": "npx playwright test DATAFILLER/tests/integration",
+    "allure:generate": "npx allure generate --clean -o allure-report",
+    "allure:open": "npx allure open allure-report"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@playwright/test": "^1.53.0",
+    "allure-playwright": "^2.15.1",
     "playwright": "^1.53.0"
   }
 }

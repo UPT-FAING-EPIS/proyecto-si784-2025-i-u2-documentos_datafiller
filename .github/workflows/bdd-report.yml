@@ -1,0 +1,62 @@
+name: 📊 Reporte BDD - PHPUnit + Playwright + UI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  bdd:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout del código
+        uses: actions/checkout@v3
+
+      # ----------- PHPUnit --------------
+      - name: 🐘 Configurar PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, pdo_mysql
+          coverage: none
+
+      - name: 📦 Instalar dependencias de PHP
+        run: |
+          cd DATAFILLER
+          composer install --no-interaction --prefer-dist
+
+      - name: ✅ Ejecutar pruebas PHPUnit
+        run: |
+          cd DATAFILLER
+          ./vendor/bin/phpunit --testsuite Unit --log-junit phpunit-results.xml
+
+      # ----------- Playwright ------------
+      - name: 🧰 Configurar Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: 📦 Instalar dependencias de Node.js
+        run: |
+          npm ci
+          npx playwright install --with-deps
+
+      - name: 🧪 Ejecutar pruebas UI (tests/)
+        run: |
+          npx playwright test tests
+
+      - name: 🧪 Ejecutar pruebas integración (DATAFILLER/tests/integration)
+        run: |
+          npx playwright test DATAFILLER/tests/integration
+
+      - name: 📊 Generar Reporte Allure
+        run: |
+          npx allure generate --clean -o allure-report
+
+      - name: ☁️ Subir Reporte BDD Allure
+        uses: actions/upload-artifact@v3
+        with:
+          name: BDD-Allure-Report
+          path: allure-report
