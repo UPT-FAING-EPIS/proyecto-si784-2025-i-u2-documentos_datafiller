@@ -15,10 +15,8 @@ test('🧪 Flujo completo: login, análisis y generación de datos', async ({ pa
   // Paso 2: Llenar credenciales y enviar
   await page.fill('input[name="nombre"]', 'nnn');
   await page.fill('input[name="password"]', '123456');
-  await Promise.all([
-    page.waitForNavigation({ waitUntil: 'domcontentloaded' }),
-    page.click('button[type="submit"]'),
-  ]);
+  await page.click('button[type="submit"]');
+  await page.waitForURL('**/views/User/generardata.php', { timeout: 15000 });
 
   const currentUrl = page.url();
   console.log('✅ Redirección detectada:', currentUrl);
@@ -51,10 +49,8 @@ CREATE TABLE productos (
   console.log('🧾 Script ingresado');
 
   // Paso 5: Enviar formulario
-  await Promise.all([
-    page.waitForNavigation({ waitUntil: 'domcontentloaded' }),
-    page.click('button[type="submit"]'),
-  ]);
+  await page.click('button[type="submit"]');
+  await page.waitForURL('**/configuracion.php', { timeout: 15000 });
   console.log('🛠️ Redirigido a configuracion.php');
 
   // Paso 6: Generar datos
