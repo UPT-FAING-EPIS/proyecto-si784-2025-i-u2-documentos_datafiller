@@ -98,6 +98,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 statusText.textContent = `✅ Archivo procesado correctamente`;
                 statusCount.textContent = `${data.tables_count} tablas detectadas`;
                 
+                // Use shared function to update status
+                window.updateScriptStatus(data.content, 'Archivo procesado');
+                
                 // Show success message
                 showNotification('✅ Archivo procesado exitosamente', 'success');
                 
@@ -178,12 +181,27 @@ document.addEventListener('DOMContentLoaded', function() {
     scriptTextarea.addEventListener('input', function() {
         const content = this.value.trim();
         if (content) {
-            const tableCount = (content.match(/CREATE\s+TABLE/gi) || []).length;
-            statusCount.textContent = `${tableCount} tabla${tableCount !== 1 ? 's' : ''} detectada${tableCount !== 1 ? 's' : ''}`;
-            statusText.textContent = tableCount > 0 ? '✅ Script válido detectado' : '⚠️ Verificando sintaxis...';
+            window.updateScriptStatus(content);
         } else {
             statusCount.textContent = '0 tablas detectadas';
             statusText.textContent = 'Listo para analizar su script';
         }
     });
+
+    // Helper function to update script status (shared with other scripts)
+    window.updateScriptStatus = function(content, filename = '') {
+        const statusText = document.getElementById('statusText');
+        const statusCount = document.getElementById('statusCount');
+        
+        if (statusText && statusCount) {
+            const tableCount = (content.match(/CREATE\s+TABLE/gi) || []).length;
+            statusCount.textContent = `${tableCount} tabla${tableCount !== 1 ? 's' : ''} detectada${tableCount !== 1 ? 's' : ''}`;
+            
+            if (filename) {
+                statusText.textContent = tableCount > 0 ? `✅ ${filename} cargado correctamente` : `⚠️ ${filename} cargado, verificando sintaxis...`;
+            } else {
+                statusText.textContent = tableCount > 0 ? '✅ Script válido detectado' : '⚠️ Verificando sintaxis...';
+            }
+        }
+    };
 });

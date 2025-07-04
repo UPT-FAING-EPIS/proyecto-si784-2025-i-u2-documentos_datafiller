@@ -89,9 +89,66 @@
                 <div class="separator-line"></div>
             </div>
 
+            <!-- SECCIÓN: GitHub -->
+            <div class="github-input-section">
+                <h3>🐙 Opción 2: Cargar desde repositorio de GitHub</h3>
+                <div class="github-container">
+                    <div class="github-step">
+                        <label>👤 Usuario/Organización de GitHub:</label>
+                        <input type="text" id="githubUser" placeholder="ejemplo: tu-usuario" class="github-input">
+                    </div>
+                    
+                    <div class="github-step">
+                        <label>📁 Repositorio:</label>
+                        <select id="githubRepo" class="github-select" disabled>
+                            <option value="">Primero selecciona un usuario</option>
+                        </select>
+                        <button type="button" id="loadRepos" class="btn small-btn" disabled>🔄 Cargar Repositorios</button>
+                    </div>
+                    
+                    <div class="github-step">
+                        <label>📂 Ruta del archivo (opcional):</label>
+                        <input type="text" id="githubPath" placeholder="ejemplo: database/schema.sql o deja vacío para buscar en raíz" class="github-input" disabled>
+                    </div>
+                    
+                    <div class="github-step">
+                        <label>📄 Archivos disponibles:</label>
+                        <select id="githubFiles" class="github-select" disabled>
+                            <option value="">Selecciona repositorio y ruta primero</option>
+                        </select>
+                        <button type="button" id="loadFiles" class="btn small-btn" disabled>🔍 Buscar Archivos .sql</button>
+                    </div>
+                    
+                    <div class="github-actions">
+                        <button type="button" id="previewGithubFile" class="btn secondary-btn" disabled>
+                            👁️ Vista Previa
+                        </button>
+                        <button type="button" id="loadGithubFile" class="btn primary-btn" disabled>
+                            ⬇️ Cargar Archivo
+                        </button>
+                    </div>
+                    
+                    <!-- Preview del archivo -->
+                    <div class="github-preview" id="githubPreview" style="display: none;">
+                        <div class="preview-header">
+                            <h4>Vista previa del archivo:</h4>
+                            <span class="preview-info" id="previewInfo"></span>
+                        </div>
+                        <pre class="preview-content" id="previewContent"></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEPARADOR -->
+            <div class="separator">
+                <div class="separator-line"></div>
+                <span class="separator-text">O</span>
+                <div class="separator-line"></div>
+            </div>
+
             <!-- SECCIÓN: Textarea manual -->
             <div class="manual-input-section">
-                <h3>✍️ Opción 2: Escribir/Pegar script manualmente</h3>
+                <h3>✍️ Opción 3: Escribir/Pegar script manualmente</h3>
                 <div class="form-group">
                     <div class="textarea-header">
                         <span class="textarea-label">Script de definición de tablas:</span>
@@ -176,5 +233,6 @@ CREATE TABLE productos (
 </div>
 
 <script src="../../public/js/file-upload.js"></script>
+<script src="../../public/js/github-integration.js"></script>
 
 <?php include 'footer.php'; ?>

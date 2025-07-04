@@ -1,0 +1,10 @@
+[2025-07-04 02:47:40] === INICIO PROCESAMIENTO POST ===
+[2025-07-04 02:47:40] Session ID: 2kqnpquiqouskacsgj59df846s
+[2025-07-04 02:47:40] Usuario en sesión: SÍ - ID: 4
+[2025-07-04 02:47:40] ✅ Usuario autenticado: prueba
+[2025-07-04 02:48:06] ORDEN DE GENERACIÓN:
+[2025-07-04 02:48:06] 0. tbmascotas
+[2025-07-04 02:48:06] 1. tbusuario
+[2025-07-04 02:48:06] 2. tbrelacion
+[2025-07-04 02:48:06] FK REAL: id_dueno -> tbusuario (IDs: 1-50)
+[2025-07-04 02:48:06] FK REAL: id_mascota -> tbmascotas (IDs: 1-50)
