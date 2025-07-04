@@ -2,6 +2,7 @@
 namespace App\Controllers;
 
 use App\Models\Usuario; // <-- Agrega el use statement correcto
+use App\Helpers\TelemetryHelper; // ✅ AGREGAR TELEMETRÍA
 
 class RegistroController {
     private $usuarioModel;
@@ -72,6 +73,13 @@ class RegistroController {
 
         // Crear usuario
         if($this->usuarioModel->crear()) {
+            // ✅ TRACKEAR REGISTRO DE USUARIO EXITOSO
+            TelemetryHelper::trackUserRegistration(
+                $this->usuarioModel->id,
+                $datos['nombre'],
+                $datos['email']
+            );
+            
             // Iniciar sesión para el usuario
             if(session_status() !== PHP_SESSION_ACTIVE) {
                 session_start();
@@ -88,6 +96,16 @@ class RegistroController {
                 'mensaje' => 'Registro exitoso. Redirigiendo a promoción de planes...'
             ];
         } else {
+            // ✅ TRACKEAR ERROR DE REGISTRO
+            TelemetryHelper::trackError(
+                'Error al crear usuario en base de datos',
+                [
+                    'error_type' => 'registration_failed',
+                    'email' => $datos['email'],
+                    'nombre' => $datos['nombre']
+                ]
+            );
+            
             return [
                 'exito' => false,
                 'mensaje' => 'No se pudo completar el registro. Por favor intente nuevamente.'

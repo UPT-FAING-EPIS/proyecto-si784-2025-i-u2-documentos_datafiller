@@ -1,9 +1,23 @@
 <?php
-session_start();
+// Verificar que la sesión esté iniciada
+if(session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+
 if (!isset($_SESSION['usuario'])) {
     header('Location: login_view.php');
     exit();
 }
+
+// Incluir configuración de PayPal
+require_once __DIR__ . '/../../vendor/autoload.php';
+use App\Config\PayPalConfig;
+use App\Helpers\TelemetryHelper;
+
+// Trackear acceso a página de planes
+TelemetryHelper::trackPageAccess($_SESSION['usuario']['id'], $_SESSION['usuario']['nombre'], 'promocion_planes');
+
+$paypalConfig = PayPalConfig::getJavaScriptConfig();
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -13,6 +27,9 @@ if (!isset($_SESSION['usuario'])) {
     <link rel="stylesheet" href="../../public/css/styles.css">
     <link rel="stylesheet" href="../../public/css/planes.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- PayPal SDK -->
+    <script src="https://www.paypal.com/sdk/js?client-id=<?php echo $paypalConfig['client_id']; ?>&currency=<?php echo $paypalConfig['currency']; ?>"></script>
 </head>
 <body>
     <div class="promocion-container">
@@ -83,10 +100,8 @@ if (!isset($_SESSION['usuario'])) {
                     </div>
                     
                     <div class="plan-footer">
-                        <a href="#" class="btn-plan btn-premium" onclick="alert('Próximamente disponible')">
-                            Actualizar a Premium
-                        </a>
-                        <p class="plan-note">7 días de prueba gratis</p>
+                        <div id="paypal-button-container-premium"></div>
+                        <p class="plan-note">7 días de prueba gratis • Cancela en cualquier momento</p>
                     </div>
                 </div>
             </div>
@@ -144,12 +159,112 @@ if (!isset($_SESSION['usuario'])) {
                     <a href="../User/generardata.php" class="btn-cta primary">
                         Comenzar a Generar Datos
                     </a>
-                    <a href="#" class="btn-cta secondary" onclick="alert('Próximamente disponible')">
-                        Obtener Premium
-                    </a>
+                    <div id="paypal-button-container-cta" style="max-width: 300px; margin: 0 auto;"></div>
                 </div>
             </div>
         </section>
     </div>
+    
+    <script>
+        // Configuración del botón PayPal
+        const paypalConfig = {
+            environment: '<?php echo $paypalConfig['environment']; ?>',
+            currency: '<?php echo $paypalConfig['currency']; ?>',
+            amount: '9.99',
+            plan_id: 2, // ID numérico del plan Premium en la base de datos
+            plan_name: 'Premium'
+        };
+        
+        // Función para crear orden
+        function createOrder() {
+            return fetch('../../paypal_create_order.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    plan_id: paypalConfig.plan_id
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Respuesta del servidor:', data); // Debug
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                if (!data.success || !data.order_id) {
+                    throw new Error('Respuesta inválida del servidor');
+                }
+                return data.order_id; // Usar order_id en lugar de id
+            });
+        }
+        
+        // Función para capturar orden
+        function captureOrder(orderId) {
+            return fetch('../../paypal_capture_order.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    order_id: orderId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Respuesta captura:', data); // Debug
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                if (!data.success) {
+                    throw new Error('Error capturando el pago');
+                }
+                
+                // Mostrar mensaje de éxito
+                alert('¡Pago procesado exitosamente! Tu plan Premium se ha activado.');
+                
+                // Redireccionar al área de usuario
+                window.location.href = '../User/generardata.php';
+                
+                return data;
+            });
+        }
+        
+        // Función para manejar error
+        function handleError(error) {
+            console.error('Error en PayPal:', error);
+            alert('Hubo un error procesando el pago. Por favor, intenta de nuevo.');
+        }
+        
+        // Renderizar botón PayPal en el plan premium
+        paypal.Buttons({
+            createOrder: createOrder,
+            onApprove: function(data, actions) {
+                return captureOrder(data.orderID);
+            },
+            onError: handleError,
+            style: {
+                color: 'gold',
+                shape: 'rect',
+                label: 'pay',
+                height: 50
+            }
+        }).render('#paypal-button-container-premium');
+        
+        // Renderizar botón PayPal en la sección CTA
+        paypal.Buttons({
+            createOrder: createOrder,
+            onApprove: function(data, actions) {
+                return captureOrder(data.orderID);
+            },
+            onError: handleError,
+            style: {
+                color: 'blue',
+                shape: 'rect',
+                label: 'subscribe',
+                height: 45
+            }
+        }).render('#paypal-button-container-cta');
+    </script>
 </body>
 </html>

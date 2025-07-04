@@ -2,6 +2,7 @@
 namespace App\Controllers;
 
 use App\Models\Usuario;
+use App\Helpers\TelemetryHelper; // ✅ AGREGAR TELEMETRÍA
 
 class LoginController {
     private $usuarioModel;
@@ -37,12 +38,27 @@ class LoginController {
                 'email' => $resultado['usuario']['email']
             ];
             
+            // ✅ TRACKEAR LOGIN EXITOSO
+            TelemetryHelper::trackLogin(
+                $resultado['usuario']['id'],
+                $resultado['usuario']['nombre'],
+                true
+            );
+            
             return [
                 'exito' => true,
                 'mensaje' => 'Inicio de sesión exitoso.',
                 'usuario' => $resultado['usuario']
             ];
         } else {
+            // ✅ TRACKEAR LOGIN FALLIDO
+            TelemetryHelper::trackLogin(
+                null,
+                $nombre,
+                false,
+                'Credenciales incorrectas'
+            );
+            
             return [
                 'exito' => false,
                 'mensaje' => 'Nombre de usuario o contraseña incorrectos.'

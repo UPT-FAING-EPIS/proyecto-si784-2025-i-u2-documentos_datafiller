@@ -8,3 +8,73 @@
 [2025-07-04 02:48:06] 2. tbrelacion
 [2025-07-04 02:48:06] FK REAL: id_dueno -> tbusuario (IDs: 1-50)
 [2025-07-04 02:48:06] FK REAL: id_mascota -> tbmascotas (IDs: 1-50)
+[2025-07-04 12:53:00] === INICIO PROCESAMIENTO POST ===
+[2025-07-04 12:53:00] Session ID: k9hgji5opvf35jecvoufglo9ql
+[2025-07-04 12:53:00] Usuario en sesión: SÍ - ID: 4
+[2025-07-04 12:53:00] ✅ Usuario autenticado: prueba
+[2025-07-04 12:53:08] ORDEN DE GENERACIÓN:
+[2025-07-04 12:53:08] 0. tbmascotas
+[2025-07-04 12:53:08] 1. tbusuario
+[2025-07-04 12:53:08] 2. tbrelacion
+[2025-07-04 12:53:08] FK REAL: id_dueno -> tbusuario (IDs: 1-50)
+[2025-07-04 12:53:08] FK REAL: id_mascota -> tbmascotas (IDs: 1-50)
+[2025-07-04 13:41:21] === INICIO PROCESAMIENTO POST ===
+[2025-07-04 13:41:21] Session ID: l4leeo51vkf1udrqq11jk5gl17
+[2025-07-04 13:41:21] Usuario en sesión: SÍ - ID: 5
+[2025-07-04 13:41:21] ✅ Usuario autenticado: Pepito
+[2025-07-04 13:41:30] ORDEN DE GENERACIÓN:
+[2025-07-04 13:41:30] 0. tbmascotas
+[2025-07-04 13:41:30] 1. tbusuario
+[2025-07-04 13:41:30] 2. tbrelacion
+[2025-07-04 13:41:30] FK REAL: id_dueno -> tbusuario (IDs: 1-50)
+[2025-07-04 13:41:30] FK REAL: id_mascota -> tbmascotas (IDs: 1-50)
+[2025-07-04 13:55:39] === INICIO PROCESAMIENTO POST ===
+[2025-07-04 13:55:39] Session ID: 18ikc6h2ututqfmh3sr5vdv79i
+[2025-07-04 13:55:39] Usuario en sesión: SÍ - ID: 4
+[2025-07-04 13:55:39] ✅ Usuario autenticado: prueba
+[2025-07-04 13:56:10] ORDEN DE GENERACIÓN:
+[2025-07-04 13:56:10] 0. tbmascotas
+[2025-07-04 13:56:10] 1. tbusuario
+[2025-07-04 13:56:10] 2. tbrelacion
+[2025-07-04 13:56:10] FK REAL: id_dueno -> tbusuario (IDs: 1-50)
+[2025-07-04 13:56:10] FK REAL: id_mascota -> tbmascotas (IDs: 1-50)
+[2025-07-04 14:16:30] === INICIO PROCESAMIENTO POST ===
+[2025-07-04 14:16:30] Session ID: rttcga0aa4pm4poj1p6vavol8g
+[2025-07-04 14:16:30] Usuario en sesión: SÍ - ID: 5
+[2025-07-04 14:16:30] ✅ Usuario autenticado: pepito
+[2025-07-04 14:16:45] ORDEN DE GENERACIÓN:
+[2025-07-04 14:16:45] 0. tbmascotas
+[2025-07-04 14:16:45] 1. tbusuario
+[2025-07-04 14:16:45] 2. tbrelacion
+[2025-07-04 14:16:45] FK REAL: id_dueno -> tbusuario (IDs: 1-50)
+[2025-07-04 14:16:45] FK REAL: id_mascota -> tbmascotas (IDs: 1-50)
+[2025-07-04 14:17:26] === INICIO PROCESAMIENTO POST ===
+[2025-07-04 14:17:26] Session ID: dp53esqffst19qgqjlecta36em
+[2025-07-04 14:17:26] Usuario en sesión: SÍ - ID: 5
+[2025-07-04 14:17:26] ✅ Usuario autenticado: pepito
+[2025-07-04 14:17:37] ORDEN DE GENERACIÓN:
+[2025-07-04 14:17:37] 0. tbmascotas
+[2025-07-04 14:17:37] 1. tbusuario
+[2025-07-04 14:17:37] 2. tbrelacion
+[2025-07-04 14:17:37] FK REAL: id_dueno -> tbusuario (IDs: 1-50)
+[2025-07-04 14:17:37] FK REAL: id_mascota -> tbmascotas (IDs: 1-50)
+[2025-07-04 14:20:58] === INICIO PROCESAMIENTO POST ===
+[2025-07-04 14:20:58] Session ID: 0lbcq36im9t6kpnmsn21gtd7ps
+[2025-07-04 14:20:58] Usuario en sesión: SÍ - ID: 4
+[2025-07-04 14:20:58] ✅ Usuario autenticado: prueba
+[2025-07-04 14:24:35] ORDEN DE GENERACIÓN:
+[2025-07-04 14:24:35] 0. tbmascotas
+[2025-07-04 14:24:35] 1. tbusuario
+[2025-07-04 14:24:35] 2. tbrelacion
+[2025-07-04 14:24:35] FK REAL: id_dueno -> tbusuario (IDs: 1-50)
+[2025-07-04 14:24:35] FK REAL: id_mascota -> tbmascotas (IDs: 1-50)
+[2025-07-04 14:25:03] === INICIO PROCESAMIENTO POST ===
+[2025-07-04 14:25:03] Session ID: acpemvtjkm0p5kq0qafgaqgagn
+[2025-07-04 14:25:03] Usuario en sesión: SÍ - ID: 5
+[2025-07-04 14:25:03] ✅ Usuario autenticado: pepito
+[2025-07-04 14:25:10] ORDEN DE GENERACIÓN:
+[2025-07-04 14:25:10] 0. tbmascotas
+[2025-07-04 14:25:10] 1. tbusuario
+[2025-07-04 14:25:10] 2. tbrelacion
+[2025-07-04 14:25:10] FK REAL: id_dueno -> tbusuario (IDs: 1-50)
+[2025-07-04 14:25:10] FK REAL: id_mascota -> tbmascotas (IDs: 1-50)

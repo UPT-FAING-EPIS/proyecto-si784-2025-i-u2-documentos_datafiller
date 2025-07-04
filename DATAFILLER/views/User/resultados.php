@@ -1,10 +1,23 @@
 <?php 
 include 'header.php';
 
+// ✅ AGREGAR TELEMETRÍA AL INICIO DE RESULTADOS.PHP
+require_once __DIR__ . '/../../vendor/autoload.php';
+use App\Helpers\TelemetryHelper;
+
 // Verificar que hay datos generados
 if(!isset($_SESSION['datos_generados']) || empty($_SESSION['datos_generados'])) {
     header('Location: generardata.php');
     exit();
+}
+
+// ✅ TRACKEAR ACCESO A RESULTADOS.PHP
+if (isset($_SESSION['usuario'])) {
+    TelemetryHelper::trackPageAccess(
+        $_SESSION['usuario']['id'], 
+        $_SESSION['usuario']['nombre'],
+        'resultados'
+    );
 }
 
 $datos_generados = $_SESSION['datos_generados'];

@@ -50,7 +50,6 @@ if(isset($_SESSION['usuario']) && isset($_SESSION['usuario']['id'])) {
         <nav class="main-nav">
             <ul>
                 <li><a href="generardata.php">GENERAR DATA</a></li>
-                <li><a href="soporte.php">SOPORTE</a></li>
                 <?php if(isset($_SESSION['usuario'])): ?>
                     <li><a href="../Auth/promocion_planes.php">PLANES</a></li>
                 <?php endif; ?>
@@ -75,4 +74,4 @@ if(isset($_SESSION['usuario']) && isset($_SESSION['usuario']['id'])) {
             <?php endif; ?>
         </div>
     </header>
-    <main class="container">
+    <main class="container"></main>

@@ -38,6 +38,7 @@ return array(
     'ColinODell\\Json5\\' => array($vendorDir . '/colinodell/json5/src'),
     'App\\Tests\\' => array($baseDir . '/tests'),
     'App\\Models\\' => array($baseDir . '/models'),
+    'App\\Helpers\\' => array($baseDir . '/helpers'),
     'App\\Controllers\\' => array($baseDir . '/controllers'),
     'App\\Config\\' => array($baseDir . '/config'),
 );

@@ -1,5 +1,8 @@
 <?php
-session_start();
+// Verificar que la sesión esté iniciada
+if(session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
 
 // Verificar que el usuario esté logueado
 if(!isset($_SESSION['usuario'])) {

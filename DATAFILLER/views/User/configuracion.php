@@ -1,10 +1,23 @@
 <?php 
 include 'header.php';
 
+// ✅ AGREGAR TELEMETRÍA AL INICIO DE CONFIGURACION.PHP
+require_once __DIR__ . '/../../vendor/autoload.php';
+use App\Helpers\TelemetryHelper;
+
 // Verificar que hay estructura analizada
 if(!isset($_SESSION['estructura_analizada']) || empty($_SESSION['estructura_analizada'])) {
     header('Location: generardata.php');
     exit();
+}
+
+// ✅ TRACKEAR ACCESO A CONFIGURACION.PHP
+if (isset($_SESSION['usuario'])) {
+    TelemetryHelper::trackPageAccess(
+        $_SESSION['usuario']['id'], 
+        $_SESSION['usuario']['nombre'],
+        'configuracion'
+    );
 }
 
 $tablas = $_SESSION['estructura_analizada'];

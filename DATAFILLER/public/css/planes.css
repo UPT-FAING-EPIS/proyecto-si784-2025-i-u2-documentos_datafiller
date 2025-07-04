@@ -121,7 +121,10 @@
 }
 
 .plan-footer {
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
     margin-top: 2rem;
 }
 
@@ -268,6 +271,42 @@
 .btn-cta.secondary:hover {
     background: white;
     color: #667eea;
+}
+
+/* PayPal Button Styling */
+#paypal-button-container-premium,
+#paypal-button-container-cta {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+#paypal-button-container-premium {
+    max-width: 100%;
+}
+
+#paypal-button-container-cta {
+    margin-top: 1.5rem;
+}
+
+/* Loading overlay for PayPal */
+.paypal-loading {
+    position: relative;
+}
+
+.paypal-loading::after {
+    content: 'Procesando pago...';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-weight: bold;
+    color: #0070ba;
 }
 
 /* Responsive */

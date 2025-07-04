@@ -7,6 +7,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 use App\Config\Database;
 use App\Models\Usuario;
 use App\Controllers\FileProcessorController;
+use App\Helpers\TelemetryHelper; // ✅ AGREGAR TELEMETRÍA
 use PhpMyAdmin\SqlParser\Parser;
 use PhpMyAdmin\SqlParser\Components\CreateDefinition;
 use PhpMyAdmin\SqlParser\Statements\CreateStatement;
@@ -34,7 +35,7 @@ class SqlAnalyzerController {
 
 
     
-    public function analizarEstructura($script, $dbType, $usuario_id) {
+    public function analizarEstructura($script, $dbType, $usuario_id, $source = 'manual') {
         try {
             // Verificar límites de consultas
             if(!$this->verificarLimitesUsuario($usuario_id)) {
@@ -64,6 +65,9 @@ class SqlAnalyzerController {
             
             // Registrar consulta en auditoría
             $this->registrarConsulta($usuario_id, 'analisis_estructura', count($tablas));
+            
+            // ✅ TRACKEAR ANÁLISIS SQL EXITOSO CON FUENTE CORRECTA
+            TelemetryHelper::trackSqlAnalysis($usuario_id, count($tablas), $source);
             
             // Guardar en sesión para siguiente paso
             $_SESSION['estructura_analizada'] = $estructura_analizada;
@@ -623,8 +627,12 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
     $dbType = $_POST['dbType'] ?? 'sql';
     $usuario_id = $_SESSION['usuario']['id'];
     
+    // ✅ DETECTAR FUENTE DEL ANÁLISIS
+    $source = 'manual'; // Por defecto
+    
     // Si se subió un archivo, procesar primero
     if(isset($_FILES['database_file']) && $_FILES['database_file']['error'] === UPLOAD_ERR_OK) {
+        $source = 'file_upload'; // Opción 1: Archivo
         $fileProcessor = new FileProcessorController();
         $fileResult = $fileProcessor->processFile();
         
@@ -635,6 +643,12 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
             header('Location: ../views/User/generardata.php');
             exit();
         }
+    } else {
+        // Verificar si viene de GitHub (por ejemplo, si hay algún parámetro específico)
+        if(isset($_POST['github_source']) && $_POST['github_source'] === 'true') {
+            $source = 'github'; // Opción 2: GitHub
+        }
+        // Si no, queda como 'manual' (Opción 3)
     }
     
     if(empty(trim($script))) {
@@ -644,7 +658,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     
     $analyzer = new SqlAnalyzerController();
-    $resultado = $analyzer->analizarEstructura($script, $dbType, $usuario_id);
+    $resultado = $analyzer->analizarEstructura($script, $dbType, $usuario_id, $source);
     
     if($resultado['exito']) {
         $_SESSION['exito'] = $resultado['mensaje'] . ". Se detectaron {$resultado['total_tablas']} tablas.";

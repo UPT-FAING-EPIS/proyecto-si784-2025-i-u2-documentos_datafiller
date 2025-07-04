@@ -168,6 +168,7 @@ class ComposerStaticInit3fb5a307183627a23aeed132a1bec5e1
         array (
             'App\\Tests\\' => 10,
             'App\\Models\\' => 11,
+            'App\\Helpers\\' => 12,
             'App\\Controllers\\' => 16,
             'App\\Config\\' => 11,
         ),
@@ -301,6 +302,10 @@ class ComposerStaticInit3fb5a307183627a23aeed132a1bec5e1
         'App\\Models\\' => 
         array (
             0 => __DIR__ . '/../..' . '/models',
+        ),
+        'App\\Helpers\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/helpers',
         ),
         'App\\Controllers\\' => 
         array (

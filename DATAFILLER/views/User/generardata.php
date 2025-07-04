@@ -1,4 +1,21 @@
-<?php include 'header.php'; ?>
+<?php 
+// ✅ AGREGAR TELEMETRÍA AL INICIO DE GENERARDATA.PHP (antes del include header)
+session_start(); // Asegurar que la sesión esté iniciada
+
+require_once __DIR__ . '/../../vendor/autoload.php';
+use App\Config\ApplicationInsights;
+use App\Helpers\TelemetryHelper;
+
+// Trackear acceso a la página
+if (isset($_SESSION['usuario'])) {
+    TelemetryHelper::trackGenerarDataAccess(
+        $_SESSION['usuario']['id'], 
+        $_SESSION['usuario']['nombre']
+    );
+}
+
+include 'header.php'; 
+?>
 
 <div class="tab-container">
     <div class="tabs">
@@ -231,6 +248,84 @@ CREATE TABLE productos (
         <p>Procesando archivo...</p>
     </div>
 </div>
+
+<!-- ✅ AGREGAR APPLICATION INSIGHTS JAVASCRIPT -->
+<?php echo ApplicationInsights::getJavaScriptSnippet(); ?>
+
+<script>
+// ✅ CONFIGURAR TELEMETRÍA FRONTEND
+<?php if(isset($_SESSION['usuario'])): ?>
+// Configurar usuario autenticado en Application Insights
+if (typeof appInsights !== 'undefined') {
+    appInsights.setAuthenticatedUserContext('<?php echo $_SESSION['usuario']['id']; ?>', '<?php echo addslashes($_SESSION['usuario']['nombre']); ?>');
+    
+    // Trackear información del plan del usuario
+    appInsights.trackEvent({
+        name: 'GenerarDataPageView',
+        properties: {
+            userId: '<?php echo $_SESSION['usuario']['id']; ?>',
+            userName: '<?php echo addslashes($_SESSION['usuario']['nombre']); ?>',
+            plan: '<?php echo $plan_usuario; ?>',
+            consultasRestantes: '<?php echo $consultas_restantes; ?>',
+            page: 'generardata'
+        }
+    });
+}
+<?php endif; ?>
+
+// Trackear envío del formulario
+document.querySelector('form').addEventListener('submit', function(e) {
+    <?php if(isset($_SESSION['usuario'])): ?>
+    if (typeof appInsights !== 'undefined') {
+        const dbType = document.querySelector('input[name="dbType"]:checked').value;
+        
+        // 🔍 DETECTAR QUÉ OPCIÓN USÓ EL USUARIO
+        let sourceOption = 'unknown';
+        const fileInput = document.querySelector('input[name="database_file"]');
+        const textareaInput = document.querySelector('textarea[name="script"]');
+        
+        if (fileInput && fileInput.files && fileInput.files.length > 0) {
+            sourceOption = 'file_upload'; // Opción 1: Archivo
+        } else if (textareaInput && textareaInput.value.trim() !== '') {
+            // Verificar si viene de GitHub o es manual
+            const githubContainer = document.querySelector('.github-container');
+            if (githubContainer && githubContainer.dataset.githubUsed === 'true') {
+                sourceOption = 'github'; // Opción 2: GitHub
+            } else {
+                sourceOption = 'manual'; // Opción 3: Manual
+            }
+        }
+        
+        appInsights.trackEvent({
+            name: 'SqlAnalysisSubmitted',
+            properties: {
+                userId: '<?php echo $_SESSION['usuario']['id']; ?>',
+                userName: '<?php echo addslashes($_SESSION['usuario']['nombre']); ?>',
+                dbType: dbType,
+                sourceOption: sourceOption, // 🎯 NUEVA MÉTRICA
+                timestamp: new Date().toISOString()
+            }
+        });
+    }
+    <?php endif; ?>
+});
+
+// Trackear clics en las pestañas
+document.querySelectorAll('.tab').forEach(function(tab) {
+    tab.addEventListener('click', function(e) {
+        if (typeof appInsights !== 'undefined') {
+            appInsights.trackEvent({
+                name: 'TabClick',
+                properties: {
+                    tabName: this.textContent.trim(),
+                    fromPage: 'generardata',
+                    userId: '<?php echo $_SESSION['usuario']['id'] ?? 'anonymous'; ?>'
+                }
+            });
+        }
+    });
+});
+</script>
 
 <script src="../../public/js/file-upload.js"></script>
 <script src="../../public/js/github-integration.js"></script>
